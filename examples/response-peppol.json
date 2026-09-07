@@ -1,0 +1,236 @@
+{
+  "ok": true,
+  "source": {
+    "syntax": "UBL",
+    "format": "peppol-bis3",
+    "profile": "Peppol BIS Billing 3.0",
+    "container": "xml",
+    "root_element": "Invoice",
+    "document_kind": "Invoice"
+  },
+  "invoice": {
+    "schema": "invoicein/canonical/1",
+    "source": {
+      "syntax": "UBL",
+      "format": "peppol-bis3",
+      "profile": "Peppol BIS Billing 3.0",
+      "container": "xml",
+      "root_element": "Invoice",
+      "document_kind": "Invoice"
+    },
+    "document": {
+      "id": "Snippet1",
+      "issue_date": "2017-11-13",
+      "type_code": "380",
+      "type": "invoice",
+      "currency": "EUR",
+      "due_date": "2017-12-01",
+      "buyer_reference": "0150abc",
+      "buyer_accounting_reference": "4025:123:4343",
+      "payment_terms": "Payment within 10 days, 2% discount",
+      "specification_id": "urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0",
+      "business_process": "urn:fdc:peppol.eu:2017:poacc:billing:01:1.0"
+    },
+    "seller": {
+      "name": "SupplierOfficialName Ltd",
+      "trading_name": "SupplierTradingName Ltd.",
+      "ids": [
+        {
+          "value": "99887766"
+        }
+      ],
+      "legal_id": {
+        "value": "GB983294"
+      },
+      "vat_id": "GB1232434",
+      "electronic_address": {
+        "value": "9482348239847239874",
+        "scheme": "0088"
+      },
+      "address": {
+        "line1": "Main street 1",
+        "line2": "Postbox 123",
+        "city": "London",
+        "postcode": "GB 123 EW",
+        "country": "GB"
+      }
+    },
+    "buyer": {
+      "name": "Buyer Official Name",
+      "trading_name": "BuyerTradingName AS",
+      "ids": [
+        {
+          "value": "FR23342",
+          "scheme": "0002"
+        }
+      ],
+      "legal_id": {
+        "value": "39937423947",
+        "scheme": "0183"
+      },
+      "vat_id": "SE4598375937",
+      "electronic_address": {
+        "value": "FR23342",
+        "scheme": "0002"
+      },
+      "address": {
+        "line1": "Hovedgatan 32",
+        "line2": "Po box 878",
+        "city": "Stockholm",
+        "postcode": "456 34",
+        "country": "SE"
+      },
+      "contact": {
+        "name": "Lisa Johnson",
+        "phone": "23434234",
+        "email": "lj@buyer.se"
+      }
+    },
+    "delivery": {
+      "name": "Delivery party Name",
+      "location_id": {
+        "value": "9483759475923478",
+        "scheme": "0088"
+      },
+      "date": "2017-11-01",
+      "address": {
+        "line1": "Delivery street 2",
+        "line2": "Building 56",
+        "city": "Stockholm",
+        "postcode": "21234",
+        "country": "SE"
+      }
+    },
+    "payment": {
+      "means_code": "30",
+      "means_text": "Credit transfer",
+      "remittance_info": "Snippet1",
+      "credit_transfers": [
+        {
+          "iban": "IBAN32423940",
+          "account_name": "AccountName",
+          "bic": "BIC324098"
+        }
+      ]
+    },
+    "charges": [
+      {
+        "charge": true,
+        "amount": 25,
+        "tax": {
+          "category": "S",
+          "rate": 25
+        },
+        "reason": "Insurance"
+      }
+    ],
+    "totals": {
+      "line_net": 1300,
+      "charges": 25,
+      "net": 1325,
+      "tax": 331.25,
+      "gross": 1656.25,
+      "due": 1656.25
+    },
+    "tax_breakdown": [
+      {
+        "taxable_amount": 1325,
+        "tax_amount": 331.25,
+        "category": "S",
+        "rate": 25
+      }
+    ],
+    "lines": [
+      {
+        "id": "1",
+        "quantity": 7,
+        "unit": "DAY",
+        "net_amount": 2800,
+        "order_line_reference": "123",
+        "accounting_reference": "Konteringsstreng",
+        "price": {
+          "net": 400
+        },
+        "tax": {
+          "category": "S",
+          "rate": 25
+        },
+        "item": {
+          "name": "item name",
+          "description": "Description of item",
+          "standard_id": {
+            "value": "21382183120983",
+            "scheme": "0088"
+          },
+          "classifications": [
+            {
+              "value": "09348023",
+              "scheme": "SRV"
+            }
+          ],
+          "origin_country": "NO"
+        }
+      },
+      {
+        "id": "2",
+        "quantity": -3,
+        "unit": "DAY",
+        "net_amount": -1500,
+        "order_line_reference": "123",
+        "price": {
+          "net": 500
+        },
+        "tax": {
+          "category": "S",
+          "rate": 25
+        },
+        "item": {
+          "name": "item name 2",
+          "description": "Description 2",
+          "standard_id": {
+            "value": "21382183120983",
+            "scheme": "0088"
+          },
+          "classifications": [
+            {
+              "value": "09348023",
+              "scheme": "SRV"
+            }
+          ],
+          "origin_country": "NO"
+        }
+      }
+    ]
+  },
+  "validation": {
+    "valid": true,
+    "errors": 0,
+    "warnings": 0,
+    "rule_sets": [
+      {
+        "id": "XSD:ubl-invoice",
+        "version": ""
+      },
+      {
+        "id": "EN16931-UBL",
+        "version": "EN 16931 validation artefacts 1.3.16"
+      },
+      {
+        "id": "Peppol-UBL",
+        "version": "Peppol BIS Billing 3.0 (rules master, Sep 2026)"
+      }
+    ],
+    "issues": [],
+    "notes": []
+  },
+  "timings_ms": {
+    "detect": 0.5,
+    "map": 14.4,
+    "validate": 86.0,
+    "total": 100.8
+  },
+  "credits": {
+    "mode": "key",
+    "remaining": 99
+  }
+}

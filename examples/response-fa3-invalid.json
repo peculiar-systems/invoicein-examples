@@ -1,0 +1,57 @@
+{
+  "ok": true,
+  "source": {
+    "syntax": "FA3",
+    "format": "ksef-fa3",
+    "profile": "FA (3)",
+    "container": "xml",
+    "root_element": "Faktura",
+    "document_kind": "Faktura"
+  },
+  "document": {
+    "id": "FV2026/02/001",
+    "issue_date": "2026-02-15",
+    "type_code": "380",
+    "type": "invoice",
+    "currency": "PLN"
+  },
+  "validation": {
+    "valid": false,
+    "errors": 1,
+    "warnings": 0,
+    "rule_sets": [
+      {
+        "id": "XSD:fa3",
+        "version": ""
+      },
+      {
+        "id": "ARITH",
+        "version": ""
+      }
+    ],
+    "issues": [
+      {
+        "id": "XSD-UNEXPECTED-ELEMENT",
+        "severity": "error",
+        "message": "Element '{http://crd.gov.pl/wzor/2025/06/25/13775/}Adnotacje': This element is not expected. Expected is one of ( {http://crd.gov.pl/wzor/2025/06/25/13775/}P_14_1W, {http://crd.gov.pl/wzor/2025/06/25/13775/}P_13_2, {http://crd.gov.pl/wzor/2025/06/25/13775/}P_13_3, {http://crd.gov.pl/wzor/2025/06/25/13775/}P_13_4, {http://crd.gov.pl/wzor/2025/06/25/13775/}P_13_5, {http://crd.gov.pl/wzor/2025/06/25/13775/}P_13_6_1, {http://crd.gov.pl/wzor/2025/06/25/13775/}P_13_6_2, {http://crd.gov.pl/wzor/2025/06/25/13775/}P_13_6_3, {http://crd.gov.pl/wzor/2025/06/25/13775/}P_13_7, {http://crd.gov.pl/wzor/2025/06/25/13775/}P_13_8 ).",
+        "rule_set": "XSD:fa3",
+        "hint": "XML zawiera element, którego schemat nie dopuszcza w tym miejscu. Nazwa elementu jest błędna, element należy do innego profilu/wersji (np. UBL 2.0 lub ZUGFeRD EXTENDED), jest zdublowany albo jest własnym rozszerzeniem. Usuń go lub zmień jego nazwę.",
+        "field": "(XML element named in the message)",
+        "who": "sender",
+        "location": "/*/*[4]/*[8]",
+        "line": 43
+      }
+    ],
+    "notes": []
+  },
+  "timings_ms": {
+    "detect": 0.3,
+    "map": 27.2,
+    "validate": 9.0,
+    "total": 36.5
+  },
+  "credits": {
+    "mode": "key",
+    "remaining": 98
+  }
+}

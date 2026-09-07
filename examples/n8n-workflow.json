@@ -1,0 +1,73 @@
+{
+  "name": "InvoiceIn — parse incoming e-invoice",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## InvoiceIn\nDrop this in front of any workflow that receives e-invoices (IMAP trigger, webhook, file watcher).\n\nThe HTTP Request node posts the binary attachment to InvoiceIn and returns canonical EN 16931 JSON plus a validation report. Set your API key in the node's header (or remove it to use the 20-a-day demo quota).",
+        "height": 220,
+        "width": 420
+      },
+      "name": "About",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [200, 80]
+    },
+    {
+      "parameters": {},
+      "name": "When clicking Test workflow",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [200, 340]
+    },
+    {
+      "parameters": {
+        "url": "https://invoicein-api.peculiar.systems/v1/invoice",
+        "sendQuery": true,
+        "queryParameters": { "parameters": [ { "name": "include", "value": "validation" }, { "name": "lang", "value": "en" } ] },
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "X-Api-Key", "value": "={{ $env.INVOICEIN_KEY }}" } ] },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": { "parameters": [ { "parameterType": "formBinaryData", "name": "file", "inputDataFieldName": "data" } ] },
+        "options": {}
+      },
+      "name": "InvoiceIn: parse + validate",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 340]
+    },
+    {
+      "parameters": {
+        "conditions": { "boolean": [ { "value1": "={{ $json.validation.valid }}", "value2": true } ] }
+      },
+      "name": "Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [720, 340]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Shape the canonical JSON for your ledger / ERP node\nconst inv = $input.first().json.invoice;\nreturn [{ json: {\n  number: inv.document.id,\n  date: inv.document.issue_date,\n  due: inv.document.due_date,\n  currency: inv.document.currency,\n  supplier: inv.seller?.name,\n  supplier_vat: inv.seller?.vat_id,\n  net: inv.totals.net,\n  vat: inv.totals.tax,\n  gross: inv.totals.gross,\n  iban: inv.payment?.credit_transfers?.[0]?.iban,\n  lines: (inv.lines || []).map(l => ({ name: l.item?.name, qty: l.quantity, net: l.net_amount, vat_rate: l.tax?.rate })),\n} }];"
+      },
+      "name": "To ledger fields",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [980, 240]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Forward the fix hints to whoever talks to the supplier\nconst v = $input.first().json.validation;\nconst text = v.issues.map(i => `• ${i.id} (${i.severity}): ${i.hint || i.message}`).join('\\n');\nreturn [{ json: { subject: `Invoice rejected: ${v.errors} error(s)`, text } }];"
+      },
+      "name": "Fix hints for the supplier",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [980, 440]
+    }
+  ],
+  "connections": {
+    "When clicking Test workflow": { "main": [ [ { "node": "InvoiceIn: parse + validate", "type": "main", "index": 0 } ] ] },
+    "InvoiceIn: parse + validate": { "main": [ [ { "node": "Valid?", "type": "main", "index": 0 } ] ] },
+    "Valid?": { "main": [ [ { "node": "To ledger fields", "type": "main", "index": 0 } ], [ { "node": "Fix hints for the supplier", "type": "main", "index": 0 } ] ] }
+  },
+  "settings": { "executionOrder": "v1" }
+}
