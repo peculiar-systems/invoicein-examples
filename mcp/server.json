@@ -1,7 +1,7 @@
 {
-  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.json",
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.peculiar-systems/invoicein",
-  "description": "Read and validate any European e-invoice a business receives — XRechnung, UBL, CII, ZUGFeRD/Factur-X PDF, Peppol BIS 3, FatturaPA, KSeF FA(3) — into canonical EN 16931 JSON with plain-language fix hints (EN/DE/PL/IT/FR), PDF, CSV and DATEV export.",
+  "description": "Any EU e-invoice (XRechnung, ZUGFeRD/Factur-X, Peppol, FatturaPA, KSeF) → EN 16931 JSON + fix hints",
   "status": "active",
   "repository": {
     "url": "https://github.com/peculiar-systems/invoicein-examples",

@@ -7,7 +7,7 @@ Accepts: XRechnung (UBL and CII), EN 16931 UBL 2.1 Invoice/CreditNote, Peppol BI
 - Product page: https://invoicein.peculiar.systems (EN · [DE](https://invoicein.peculiar.systems/de) · [PL](https://invoicein.peculiar.systems/pl) · [IT](https://invoicein.peculiar.systems/it) · [FR](https://invoicein.peculiar.systems/fr))
 - API reference (interactive): https://invoicein-api.peculiar.systems/docs
 - OpenAPI: https://invoicein-api.peculiar.systems/openapi.json
-- MCP server: `https://invoicein-api.peculiar.systems/mcp` (streamable HTTP)
+- MCP server: `https://invoicein-api.peculiar.systems/mcp` (streamable HTTP) — on the [official registry](https://registry.modelcontextprotocol.io/v0/servers?search=invoicein) as `io.github.peculiar-systems/invoicein` and on [Smithery](https://smithery.ai/servers/peculiar-systems/invoicein)
 
 This repository holds runnable examples, sample invoices you can test with, and the MCP registry manifest. The service itself is not open source.
 
@@ -74,6 +74,7 @@ Body: multipart field `file`, or the raw XML/PDF. Send a real `User-Agent` (Clou
 - [`examples/python.py`](examples/python.py) — standard library only
 - [`examples/n8n-workflow.json`](examples/n8n-workflow.json) — mailbox attachment → InvoiceIn → JSON, importable into n8n
 - [`mcp/server.json`](mcp/server.json) — manifest for the MCP registry; [`mcp/clients.md`](mcp/clients.md) — Claude Desktop / Cursor config
+- [`bridge/invoicein_mcp_bridge.py`](bridge/invoicein_mcp_bridge.py) — local stdio MCP server that forwards to the hosted one (for clients without remote support; `Dockerfile` builds it)
 
 ## Sample invoices
 
