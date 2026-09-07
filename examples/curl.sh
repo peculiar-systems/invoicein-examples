@@ -4,7 +4,7 @@
 # Without INVOICEIN_KEY the calls use the no-key demo quota (20 invoices a day per IP).
 set -euo pipefail
 API="${INVOICEIN_API:-https://invoicein-api.peculiar.systems}"
-AUTH=(); [ -n "${INVOICEIN_KEY:-}" ] && AUTH=(-H "X-Api-Key: $INVOICEIN_KEY")
+AUTH=(-H "X-Api-Key: ${INVOICEIN_KEY:-}")   # an empty key header is ignored by the API (demo quota applies)
 
 echo "== formats and rule-set versions"
 curl -s "$API/v1/formats" | head -c 600; echo

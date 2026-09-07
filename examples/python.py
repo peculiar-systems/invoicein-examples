@@ -14,7 +14,8 @@ with open(path, "rb") as fh:
     body = fh.read()
 
 # raw body works for XML and PDF alike; multipart (field `file`) is accepted too
-headers = {"Content-Type": "application/octet-stream"}
+# Cloudflare in front of the API rejects the default "Python-urllib" user agent (error 1010) — name your client
+headers = {"Content-Type": "application/octet-stream", "User-Agent": "invoicein-examples/1.0"}
 if os.environ.get("INVOICEIN_KEY"):
     headers["X-Api-Key"] = os.environ["INVOICEIN_KEY"]
 
@@ -24,8 +25,12 @@ try:
         data = json.load(resp)
         remaining = resp.headers.get("X-Credits-Remaining")
 except urllib.error.HTTPError as e:
-    err = json.load(e)["error"]
-    sys.exit(f"{e.code} {err['code']}: {err['message']} {err.get('hint', '')}")
+    raw = e.read().decode("utf-8", "replace")
+    try:
+        err = json.loads(raw)["error"]
+        sys.exit(f"{e.code} {err['code']}: {err['message']} {err.get('hint', '')}")
+    except (ValueError, KeyError):
+        sys.exit(f"{e.code}: {raw[:200]}")
 
 inv, val = data["invoice"], data["validation"]
 print(f"{data['source']['format']} ({data['source'].get('profile')}) — {inv['document'].get('id')} from {inv.get('seller', {}).get('name')}")

@@ -65,7 +65,7 @@ When something is wrong, every failed rule carries a hint in the requested langu
 | `POST /v1/export.datev?skr=03\|04&creditor_account=70000` | DATEV Buchungsstapel (EXTF 700, cp1252) |
 | `GET /v1/formats` · `GET /v1/rules/{id}?lang=de` · `GET /v1/schema` | formats + rule versions · explain a rule id · field guide |
 
-Body: multipart field `file`, or the raw XML/PDF. Auth: `X-Api-Key` or `Authorization: Bearer`. One invoice = one credit whatever outputs you request; a file that carries several invoices (a FatturaPA lot) costs one per invoice. Remaining credits come back in `X-Credits-Remaining`.
+Body: multipart field `file`, or the raw XML/PDF. Send a real `User-Agent` (Cloudflare rejects the default `Python-urllib` one with error 1010). Auth: `X-Api-Key` or `Authorization: Bearer`. One invoice = one credit whatever outputs you request; a file that carries several invoices (a FatturaPA lot) costs one per invoice. Remaining credits come back in `X-Credits-Remaining`.
 
 ## Examples in this repo
 
@@ -85,7 +85,7 @@ Body: multipart field `file`, or the raw XML/PDF. Auth: `X-Api-Key` or `Authoriz
 | `samples/ksef-fa3-przyklad-1.xml` | KSeF FA(3) official example no. 1 | Polish Ministry of Finance, public |
 | `samples/fatturapa-fpr01.xml` | FatturaPA 1.2 official example FPR01 | Agenzia delle Entrate, public |
 
-Both XRechnung files produce byte-identical canonical JSON — that is the point of the canonical model.
+Both XRechnung files produce the same canonical JSON (only the syntax-specific `extensions` block differs) — that is the point of the canonical model.
 
 ## What it does not do
 
