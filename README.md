@@ -74,7 +74,7 @@ Body: multipart field `file`, or the raw XML/PDF. Send a real `User-Agent` (Clou
 - [`examples/python.py`](examples/python.py) — standard library only
 - [`examples/n8n-workflow.json`](examples/n8n-workflow.json) — mailbox attachment → InvoiceIn → JSON, importable into n8n
 - [`mcp/server.json`](mcp/server.json) — manifest for the MCP registry; [`mcp/clients.md`](mcp/clients.md) — Claude Desktop / Cursor config
-- [`bridge/invoicein_mcp_bridge.py`](bridge/invoicein_mcp_bridge.py) — local stdio MCP server that forwards to the hosted one (for clients without remote support; `Dockerfile` builds it)
+- [`bridge/invoicein_mcp_bridge.py`](bridge/invoicein_mcp_bridge.py) — local stdio MCP server that mirrors the hosted server's tools one-to-one and forwards every call (for clients without remote support; `Dockerfile` builds it; `bridge/tools.json` is the offline copy of the tool definitions)
 
 ## Sample invoices
 

@@ -1,0 +1,741 @@
+{
+  "source": "https://invoicein-api.peculiar.systems/mcp/",
+  "fetched_at": "2026-09-08T09:26:06Z",
+  "tools": [
+    {
+      "name": "read_invoice",
+      "title": "Read invoice",
+      "description": "Parse one European e-invoice into canonical EN 16931 JSON and validate it against the official rule sets in the same call. Use it when you need the invoice content (seller, buyer, lines, totals, payment) together with the verdict; use validate_invoice for a verdict-only answer, invoice_to_html / invoice_to_csv / invoice_to_datev for renderings. Input: XML (UBL, CII, XRechnung, Peppol BIS 3, FatturaPA, KSeF FA(2)/FA(3)) or a ZUGFeRD/Factur-X hybrid PDF up to 25 MB; plain or scanned PDFs without embedded XML are rejected (no OCR). Returns the parsed invoice, the validation report with fix hints in `lang`, and timings; an unreadable file returns ok=false with error.code/message/hint instead of raising. A FatturaPA lot returns only its first invoice, with a note. Costs one invoice credit per call; without an API key the anonymous quota is 20 invoices per day per IP. Nothing is stored.",
+      "inputSchema": {
+        "properties": {
+          "file_base64": {
+            "default": "",
+            "description": "Invoice file content, base64-encoded (standard alphabet). Accepted content: XML in UBL 2.1, CII D16B, XRechnung, Peppol BIS Billing 3, FatturaPA 1.2 or KSeF FA(2)/FA(3) syntax, or a ZUGFeRD 1.0/2.x or Factur-X hybrid PDF (the embedded XML is used). Max 25 MB decoded. Required unless `path` is given.",
+            "title": "File Base64",
+            "type": "string"
+          },
+          "path": {
+            "default": "",
+            "description": "Absolute path of the invoice file on the machine running the server, used instead of file_base64. Only honoured over stdio (`python -m invoicein.mcp_server`); the hosted server at invoicein-api.peculiar.systems ignores it and answers with an error asking for file_base64.",
+            "title": "Path",
+            "type": "string"
+          },
+          "lang": {
+            "default": "en",
+            "description": "Language of the fix hints in the validation report and of the labels in HTML output. Default en.",
+            "enum": [
+              "en",
+              "de",
+              "pl",
+              "it",
+              "fr"
+            ],
+            "title": "Lang",
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "title": "read_invoiceArguments"
+      },
+      "outputSchema": {
+        "properties": {
+          "ok": {
+            "description": "False when the file could not be read; then only `error` is set",
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/SourceInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Detected syntax, format, profile and container"
+          },
+          "invoice": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Canonical EN 16931 JSON: document, seller, buyer, lines, tax_breakdown, totals, payment, attachments, extensions; field names carry BT/BG numbers in /v1/schema",
+            "title": "Invoice"
+          },
+          "validation": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Validation"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "timings_ms": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "number"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Processing time per stage: detect, map, validate, total",
+            "title": "Timings Ms"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Set when the file is a lot of several invoices: only the first is returned",
+            "title": "Note"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Present when ok is false: code, message, hint",
+            "title": "Error"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "type": "object",
+        "$defs": {
+          "Issue": {
+            "additionalProperties": true,
+            "properties": {
+              "id": {
+                "description": "Rule id, e.g. BR-CO-15, BR-DE-2, PEPPOL-EN16931-R040, XSD-UNEXPECTED-ELEMENT",
+                "title": "Id",
+                "type": "string"
+              },
+              "severity": {
+                "description": "error, warning or info",
+                "title": "Severity",
+                "type": "string"
+              },
+              "message": {
+                "description": "The rule's own message",
+                "title": "Message",
+                "type": "string"
+              },
+              "hint": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Plain-language explanation of what the sender must fix, in the requested language",
+                "title": "Hint"
+              },
+              "field": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Affected canonical field with its EN 16931 BT/BG number",
+                "title": "Field"
+              },
+              "who": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Who has to act: sender or receiver",
+                "title": "Who"
+              }
+            },
+            "required": [
+              "id",
+              "severity",
+              "message"
+            ],
+            "title": "Issue",
+            "type": "object"
+          },
+          "SourceInfo": {
+            "additionalProperties": true,
+            "properties": {
+              "syntax": {
+                "description": "UBL, CII, FatturaPA or FA3",
+                "title": "Syntax",
+                "type": "string"
+              },
+              "format": {
+                "description": "Detected format: xrechnung-ubl, xrechnung-cii, ubl, cii, peppol-bis3, zugferd, facturx, fatturapa, ksef-fa3, ksef-fa2",
+                "title": "Format",
+                "type": "string"
+              },
+              "profile": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Profile or specification, e.g. 'EN 16931', 'XRechnung 3.0', 'FA (3)'",
+                "title": "Profile"
+              },
+              "container": {
+                "description": "xml or pdf",
+                "title": "Container",
+                "type": "string"
+              }
+            },
+            "required": [
+              "syntax",
+              "format",
+              "container"
+            ],
+            "title": "SourceInfo",
+            "type": "object"
+          },
+          "Validation": {
+            "additionalProperties": true,
+            "properties": {
+              "valid": {
+                "description": "True when no rule of severity error failed",
+                "title": "Valid",
+                "type": "boolean"
+              },
+              "errors": {
+                "description": "Number of failed rules with severity error",
+                "title": "Errors",
+                "type": "integer"
+              },
+              "warnings": {
+                "description": "Number of failed rules with severity warning",
+                "title": "Warnings",
+                "type": "integer"
+              },
+              "rule_sets": {
+                "description": "Rule sets applied, with versions (XSD, EN 16931, XRechnung, Peppol, FatturaPA, KSeF, arithmetic)",
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "title": "Rule Sets",
+                "type": "array"
+              },
+              "issues": {
+                "description": "Failed rules, each with a fix hint",
+                "items": {
+                  "$ref": "#/$defs/Issue"
+                },
+                "title": "Issues",
+                "type": "array"
+              },
+              "notes": {
+                "description": "Informational notes about the validation run",
+                "items": {
+                  "type": "string"
+                },
+                "title": "Notes",
+                "type": "array"
+              }
+            },
+            "required": [
+              "valid",
+              "errors",
+              "warnings",
+              "rule_sets",
+              "issues"
+            ],
+            "title": "Validation",
+            "type": "object"
+          }
+        },
+        "additionalProperties": true,
+        "title": "ReadResult"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "validate_invoice",
+      "title": "Validate invoice",
+      "description": "Validate one European e-invoice against the official rule sets (XSD, EN 16931, XRechnung, Peppol BIS, FatturaPA, KSeF, arithmetic) and return the verdict without the invoice body. Use it for pass/fail and the list of errors and warnings; use read_invoice when you also need lines, totals and payment data. Input: XML (UBL, CII, XRechnung, Peppol BIS 3, FatturaPA, KSeF FA(2)/FA(3)) or a ZUGFeRD/Factur-X hybrid PDF up to 25 MB; plain or scanned PDFs without embedded XML are rejected (no OCR). Returns the validation report (valid flag, counts, rule sets with versions, failed rules with rule id, severity, fix hint in `lang`, affected field and who must act), the detected source and the document header; an unreadable file returns ok=false with error.code/message/hint instead of raising. Costs one invoice credit per call; without an API key the anonymous quota is 20 invoices per day per IP. Nothing is stored.",
+      "inputSchema": {
+        "properties": {
+          "file_base64": {
+            "default": "",
+            "description": "Invoice file content, base64-encoded (standard alphabet). Accepted content: XML in UBL 2.1, CII D16B, XRechnung, Peppol BIS Billing 3, FatturaPA 1.2 or KSeF FA(2)/FA(3) syntax, or a ZUGFeRD 1.0/2.x or Factur-X hybrid PDF (the embedded XML is used). Max 25 MB decoded. Required unless `path` is given.",
+            "title": "File Base64",
+            "type": "string"
+          },
+          "path": {
+            "default": "",
+            "description": "Absolute path of the invoice file on the machine running the server, used instead of file_base64. Only honoured over stdio (`python -m invoicein.mcp_server`); the hosted server at invoicein-api.peculiar.systems ignores it and answers with an error asking for file_base64.",
+            "title": "Path",
+            "type": "string"
+          },
+          "lang": {
+            "default": "en",
+            "description": "Language of the fix hints in the validation report and of the labels in HTML output. Default en.",
+            "enum": [
+              "en",
+              "de",
+              "pl",
+              "it",
+              "fr"
+            ],
+            "title": "Lang",
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "title": "validate_invoiceArguments"
+      },
+      "outputSchema": {
+        "properties": {
+          "ok": {
+            "description": "False when the file could not be read; then only `error` is set",
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/SourceInfo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Detected syntax, format, profile and container"
+          },
+          "document": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Invoice header: id, issue_date, type_code, currency, due_date …",
+            "title": "Document"
+          },
+          "validation": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Validation"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "error": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Present when ok is false: code, message, hint",
+            "title": "Error"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "type": "object",
+        "$defs": {
+          "Issue": {
+            "additionalProperties": true,
+            "properties": {
+              "id": {
+                "description": "Rule id, e.g. BR-CO-15, BR-DE-2, PEPPOL-EN16931-R040, XSD-UNEXPECTED-ELEMENT",
+                "title": "Id",
+                "type": "string"
+              },
+              "severity": {
+                "description": "error, warning or info",
+                "title": "Severity",
+                "type": "string"
+              },
+              "message": {
+                "description": "The rule's own message",
+                "title": "Message",
+                "type": "string"
+              },
+              "hint": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Plain-language explanation of what the sender must fix, in the requested language",
+                "title": "Hint"
+              },
+              "field": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Affected canonical field with its EN 16931 BT/BG number",
+                "title": "Field"
+              },
+              "who": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Who has to act: sender or receiver",
+                "title": "Who"
+              }
+            },
+            "required": [
+              "id",
+              "severity",
+              "message"
+            ],
+            "title": "Issue",
+            "type": "object"
+          },
+          "SourceInfo": {
+            "additionalProperties": true,
+            "properties": {
+              "syntax": {
+                "description": "UBL, CII, FatturaPA or FA3",
+                "title": "Syntax",
+                "type": "string"
+              },
+              "format": {
+                "description": "Detected format: xrechnung-ubl, xrechnung-cii, ubl, cii, peppol-bis3, zugferd, facturx, fatturapa, ksef-fa3, ksef-fa2",
+                "title": "Format",
+                "type": "string"
+              },
+              "profile": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Profile or specification, e.g. 'EN 16931', 'XRechnung 3.0', 'FA (3)'",
+                "title": "Profile"
+              },
+              "container": {
+                "description": "xml or pdf",
+                "title": "Container",
+                "type": "string"
+              }
+            },
+            "required": [
+              "syntax",
+              "format",
+              "container"
+            ],
+            "title": "SourceInfo",
+            "type": "object"
+          },
+          "Validation": {
+            "additionalProperties": true,
+            "properties": {
+              "valid": {
+                "description": "True when no rule of severity error failed",
+                "title": "Valid",
+                "type": "boolean"
+              },
+              "errors": {
+                "description": "Number of failed rules with severity error",
+                "title": "Errors",
+                "type": "integer"
+              },
+              "warnings": {
+                "description": "Number of failed rules with severity warning",
+                "title": "Warnings",
+                "type": "integer"
+              },
+              "rule_sets": {
+                "description": "Rule sets applied, with versions (XSD, EN 16931, XRechnung, Peppol, FatturaPA, KSeF, arithmetic)",
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "title": "Rule Sets",
+                "type": "array"
+              },
+              "issues": {
+                "description": "Failed rules, each with a fix hint",
+                "items": {
+                  "$ref": "#/$defs/Issue"
+                },
+                "title": "Issues",
+                "type": "array"
+              },
+              "notes": {
+                "description": "Informational notes about the validation run",
+                "items": {
+                  "type": "string"
+                },
+                "title": "Notes",
+                "type": "array"
+              }
+            },
+            "required": [
+              "valid",
+              "errors",
+              "warnings",
+              "rule_sets",
+              "issues"
+            ],
+            "title": "Validation",
+            "type": "object"
+          }
+        },
+        "additionalProperties": true,
+        "title": "ValidateResult"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "invoice_to_html",
+      "title": "Render invoice as HTML",
+      "description": "Render one European e-invoice as a self-contained, printable HTML page: header, seller and buyer, line items, VAT breakdown, totals and payment details in one layout regardless of the source syntax, labels in `lang`. Use it to show an invoice to a person or to print it to PDF from a browser; it does not validate (use validate_invoice) and is not an accounting export (use invoice_to_csv or invoice_to_datev). Input: XML (UBL, CII, XRechnung, Peppol BIS 3, FatturaPA, KSeF FA(2)/FA(3)) or a ZUGFeRD/Factur-X hybrid PDF up to 25 MB; plain or scanned PDFs without embedded XML are rejected (no OCR). Returns the HTML document as one text string with inline CSS and no external assets; an unreadable file returns a tool error with the reason. Costs one invoice credit per call; without an API key the anonymous quota is 20 invoices per day per IP. Nothing is stored.",
+      "inputSchema": {
+        "properties": {
+          "file_base64": {
+            "default": "",
+            "description": "Invoice file content, base64-encoded (standard alphabet). Accepted content: XML in UBL 2.1, CII D16B, XRechnung, Peppol BIS Billing 3, FatturaPA 1.2 or KSeF FA(2)/FA(3) syntax, or a ZUGFeRD 1.0/2.x or Factur-X hybrid PDF (the embedded XML is used). Max 25 MB decoded. Required unless `path` is given.",
+            "title": "File Base64",
+            "type": "string"
+          },
+          "path": {
+            "default": "",
+            "description": "Absolute path of the invoice file on the machine running the server, used instead of file_base64. Only honoured over stdio (`python -m invoicein.mcp_server`); the hosted server at invoicein-api.peculiar.systems ignores it and answers with an error asking for file_base64.",
+            "title": "Path",
+            "type": "string"
+          },
+          "lang": {
+            "default": "en",
+            "description": "Language of the fix hints in the validation report and of the labels in HTML output. Default en.",
+            "enum": [
+              "en",
+              "de",
+              "pl",
+              "it",
+              "fr"
+            ],
+            "title": "Lang",
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "title": "invoice_to_htmlArguments"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object",
+        "title": "invoice_to_htmlOutput"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "invoice_to_csv",
+      "title": "Export invoice as CSV",
+      "description": "Export one European e-invoice as a flat CSV table for a spreadsheet or a database import. Document columns: invoice id, type, issue and due date, currency, seller and buyer name / VAT id / country, buyer and order reference, net / tax / gross / due totals, IBAN, BIC, remittance info, detected format and profile; with level=lines each row adds line id, item name, seller item id, quantity, unit, unit price, net amount, VAT category and rate, note. Use invoice_to_datev for DATEV bookkeeping and read_invoice for the full JSON. Input: XML (UBL, CII, XRechnung, Peppol BIS 3, FatturaPA, KSeF FA(2)/FA(3)) or a ZUGFeRD/Factur-X hybrid PDF up to 25 MB; plain or scanned PDFs without embedded XML are rejected (no OCR). A FatturaPA lot yields rows for every invoice in it. Returns the CSV as one text string: comma-separated, header row first, LF line endings, decimal point; an unreadable file returns a tool error with the reason. Costs one invoice credit per call; without an API key the anonymous quota is 20 invoices per day per IP. Nothing is stored.",
+      "inputSchema": {
+        "properties": {
+          "file_base64": {
+            "default": "",
+            "description": "Invoice file content, base64-encoded (standard alphabet). Accepted content: XML in UBL 2.1, CII D16B, XRechnung, Peppol BIS Billing 3, FatturaPA 1.2 or KSeF FA(2)/FA(3) syntax, or a ZUGFeRD 1.0/2.x or Factur-X hybrid PDF (the embedded XML is used). Max 25 MB decoded. Required unless `path` is given.",
+            "title": "File Base64",
+            "type": "string"
+          },
+          "path": {
+            "default": "",
+            "description": "Absolute path of the invoice file on the machine running the server, used instead of file_base64. Only honoured over stdio (`python -m invoicein.mcp_server`); the hosted server at invoicein-api.peculiar.systems ignores it and answers with an error asking for file_base64.",
+            "title": "Path",
+            "type": "string"
+          },
+          "level": {
+            "default": "lines",
+            "description": "'lines' (default) = one row per line item with the document columns repeated on every row; 'documents' = one row per invoice with the document columns only.",
+            "enum": [
+              "lines",
+              "documents"
+            ],
+            "title": "Level",
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "title": "invoice_to_csvArguments"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object",
+        "title": "invoice_to_csvOutput"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "invoice_to_datev",
+      "title": "Export invoice as DATEV Buchungsstapel",
+      "description": "Convert one received (purchase) e-invoice into a DATEV Buchungsstapel import file (EXTF format 700) for German bookkeeping in DATEV Kanzlei-Rechnungswesen or Unternehmen online. Use it only for incoming invoices booked on the German side; use invoice_to_csv for a generic table, read_invoice for the raw data, validate_invoice for rule checks (this tool does not validate). Input: XML (UBL, CII, XRechnung, Peppol BIS 3, FatturaPA, KSeF FA(2)/FA(3)) or a ZUGFeRD/Factur-X hybrid PDF up to 25 MB; plain or scanned PDFs without embedded XML are rejected (no OCR). Returns the file content as one text string, decoded from cp1252: the EXTF header line, the DATEV column header, then one booking row per VAT-rate group with the gross amount and S/H flag (H for credit notes), the expense account chosen by rate under the selected SKR (e.g. SKR03 3400 for 19 %, 3300 for 7 %, 3200 for 0 %, 3120 intra-EU, 3425 reverse charge), the creditor account as Gegenkonto, document and due date, invoice number in Belegfeld 1, seller name as Buchungstext and the seller VAT id on intra-EU / reverse-charge rows. Save it as cp1252 with CRLF before importing; the account mapping is a default to confirm with the tax advisor. An unreadable file returns a tool error with the reason. Costs one invoice credit per call; without an API key the anonymous quota is 20 invoices per day per IP. Nothing is stored.",
+      "inputSchema": {
+        "properties": {
+          "file_base64": {
+            "default": "",
+            "description": "Invoice file content, base64-encoded (standard alphabet). Accepted content: XML in UBL 2.1, CII D16B, XRechnung, Peppol BIS Billing 3, FatturaPA 1.2 or KSeF FA(2)/FA(3) syntax, or a ZUGFeRD 1.0/2.x or Factur-X hybrid PDF (the embedded XML is used). Max 25 MB decoded. Required unless `path` is given.",
+            "title": "File Base64",
+            "type": "string"
+          },
+          "path": {
+            "default": "",
+            "description": "Absolute path of the invoice file on the machine running the server, used instead of file_base64. Only honoured over stdio (`python -m invoicein.mcp_server`); the hosted server at invoicein-api.peculiar.systems ignores it and answers with an error asking for file_base64.",
+            "title": "Path",
+            "type": "string"
+          },
+          "skr": {
+            "default": "03",
+            "description": "German standard chart of accounts that selects the expense accounts: '03' = SKR03 (default), '04' = SKR04.",
+            "enum": [
+              "03",
+              "04"
+            ],
+            "title": "Skr",
+            "type": "string"
+          },
+          "creditor_account": {
+            "default": "70000",
+            "description": "Creditor account (Kreditor, written as Gegenkonto) the invoice is posted against: 4–9 digits as configured in the DATEV client, e.g. '70000' (default). Use the supplier's creditor number.",
+            "pattern": "^[0-9]{4,9}$",
+            "title": "Creditor Account",
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "title": "invoice_to_datevArguments"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object",
+        "title": "invoice_to_datevOutput"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
