@@ -95,3 +95,7 @@ No OCR (a PDF without embedded XML is rejected with `pdf-no-xml`). Not a Peppol 
 ## Licence
 
 The examples in this repository are MIT. Sample invoices keep the licences listed above.
+
+## Licence
+
+This repository is MIT-licensed (see LICENSE). Sample invoices under `samples/` keep the licences of their sources, noted next to each file.
