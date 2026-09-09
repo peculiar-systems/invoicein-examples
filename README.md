@@ -7,6 +7,7 @@ Accepts: XRechnung (UBL and CII), EN 16931 UBL 2.1 Invoice/CreditNote, Peppol BI
 - Product page: https://invoicein.peculiar.systems (EN · [DE](https://invoicein.peculiar.systems/de) · [PL](https://invoicein.peculiar.systems/pl) · [IT](https://invoicein.peculiar.systems/it) · [FR](https://invoicein.peculiar.systems/fr))
 - API reference (interactive): https://invoicein-api.peculiar.systems/docs
 - OpenAPI: https://invoicein-api.peculiar.systems/openapi.json
+- Postman: [public collection](https://www.postman.com/peculiar-systems-3265262/peculiar-systems/collection/4xkrtoq/invoicein-inbound-e-invoice-api) · [published docs](https://documenter.getpostman.com/view/58098057/2sBYAxRVjo) — or import [`postman/InvoiceIn.postman_collection.json`](postman/InvoiceIn.postman_collection.json). Every request already carries a real XRechnung in its body, so Send works with no setup
 - MCP server: `https://invoicein-api.peculiar.systems/mcp` (streamable HTTP) — on the [official registry](https://registry.modelcontextprotocol.io/v0/servers?search=invoicein) as `io.github.peculiar-systems/invoicein` and on [Smithery](https://smithery.ai/servers/peculiar-systems/invoicein)
 
 This repository holds runnable examples, sample invoices you can test with, and the MCP registry manifest. The service itself is not open source.

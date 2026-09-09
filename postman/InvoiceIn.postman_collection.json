@@ -1,0 +1,380 @@
+{
+  "info": {
+    "_postman_id": "e16d1d39-a659-41e2-820f-e8c1636e19fc",
+    "name": "InvoiceIn — inbound e-invoice API",
+    "description": "Every e-invoice you receive, as one JSON.\n\nPOST an XRechnung, ZUGFeRD/Factur-X, Peppol, FatturaPA or KSeF file — XML or hybrid PDF — and get canonical EN 16931 JSON, a validation report with plain-language fix hints, a readable PDF, and CSV or DATEV exports. One stateless endpoint per output, nothing stored.\n\n**Try it now.** Every request below already carries a real XRechnung 3.0 invoice in its body, so Send works immediately: the demo quota is 20 invoices per IP per day and needs no key.\n\n**With a key.** Set the collection variable `apiKey`; it is sent as `x-api-key`. A trial key is 100 invoices over 30 days — invoicein.peculiar.systems.\n\nOne invoice = one credit whatever outputs you ask for. A file carrying several invoices (a FatturaPA lot) costs one per invoice.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "x-api-key",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "{{apiKey}}",
+        "type": "string"
+      },
+      {
+        "key": "in",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://invoicein-api.peculiar.systems",
+      "description": "API base URL."
+    },
+    {
+      "key": "apiKey",
+      "value": "",
+      "description": "Optional. Leave empty to use the keyless demo quota (20 invoices/IP/day)."
+    }
+  ],
+  "item": [
+    {
+      "name": "1 · Everything in one call",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/xml"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/v1/invoice?include=validation&lang=en",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "v1",
+            "invoice"
+          ],
+          "query": [
+            {
+              "key": "include",
+              "value": "validation",
+              "description": "Extras to add: validation, html, pdf, csv, datev (comma separated)."
+            },
+            {
+              "key": "lang",
+              "value": "en",
+              "description": "Language of the fix hints: en, de, pl, it, fr."
+            }
+          ]
+        },
+        "description": "POST any received e-invoice and get canonical EN 16931 JSON plus a validation report with plain-language fix hints.\n\nThe body below is a real XRechnung 3.0 (UBL) invoice, so you can press Send straight away — no key needed, 20 invoices per IP per day. Replace it with your own XRechnung, ZUGFeRD/Factur-X, Peppol, FatturaPA or KSeF file; a hybrid PDF goes in the same way with Content-Type application/pdf.\n\nNothing is stored: the file is parsed in memory and discarded with the response.",
+        "body": {
+          "mode": "raw",
+          "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Invoice xmlns=\"urn:oasis:names:specification:ubl:schema:xsd:Invoice-2\"\n         xmlns:cac=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\"\n         xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\">\n  <cbc:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0</cbc:CustomizationID>\n  <cbc:ProfileID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</cbc:ProfileID>\n  <cbc:ID>RE-2026-0421</cbc:ID>\n  <cbc:IssueDate>2026-08-30</cbc:IssueDate>\n  <cbc:DueDate>2026-09-29</cbc:DueDate>\n  <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>\n  <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>\n  <cbc:BuyerReference>04011000-12345-03</cbc:BuyerReference>\n  <cac:AccountingSupplierParty>\n    <cac:Party>\n      <cbc:EndpointID schemeID=\"EM\">rechnung@nordlicht-werkstatt.de</cbc:EndpointID>\n      <cac:PostalAddress>\n        <cbc:StreetName>Kanalstraße 12</cbc:StreetName>\n        <cbc:CityName>Kiel</cbc:CityName>\n        <cbc:PostalZone>24103</cbc:PostalZone>\n        <cac:Country><cbc:IdentificationCode>DE</cbc:IdentificationCode></cac:Country>\n      </cac:PostalAddress>\n      <cac:PartyTaxScheme>\n        <cbc:CompanyID>DE123456789</cbc:CompanyID>\n        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>\n      </cac:PartyTaxScheme>\n      <cac:PartyLegalEntity>\n        <cbc:RegistrationName>Nordlicht Werkstatt GmbH</cbc:RegistrationName>\n      </cac:PartyLegalEntity>\n      <cac:Contact>\n        <cbc:Name>Buchhaltung</cbc:Name>\n        <cbc:Telephone>+49 431 0000000</cbc:Telephone>\n        <cbc:ElectronicMail>rechnung@nordlicht-werkstatt.de</cbc:ElectronicMail>\n      </cac:Contact>\n    </cac:Party>\n  </cac:AccountingSupplierParty>\n  <cac:AccountingCustomerParty>\n    <cac:Party>\n      <cbc:EndpointID schemeID=\"EM\">ap@beispiel-bau.de</cbc:EndpointID>\n      <cac:PostalAddress>\n        <cbc:StreetName>Hafenweg 3</cbc:StreetName>\n        <cbc:CityName>Hamburg</cbc:CityName>\n        <cbc:PostalZone>20095</cbc:PostalZone>\n        <cac:Country><cbc:IdentificationCode>DE</cbc:IdentificationCode></cac:Country>\n      </cac:PostalAddress>\n      <cac:PartyLegalEntity>\n        <cbc:RegistrationName>Beispiel Bau AG</cbc:RegistrationName>\n      </cac:PartyLegalEntity>\n    </cac:Party>\n  </cac:AccountingCustomerParty>\n  <cac:PaymentMeans>\n    <cbc:PaymentMeansCode>58</cbc:PaymentMeansCode>\n    <cac:PayeeFinancialAccount>\n      <cbc:ID>DE02120300000000202051</cbc:ID>\n      <cbc:Name>Nordlicht Werkstatt GmbH</cbc:Name>\n    </cac:PayeeFinancialAccount>\n  </cac:PaymentMeans>\n  <cac:PaymentTerms><cbc:Note>Zahlbar innerhalb 30 Tagen ohne Abzug.</cbc:Note></cac:PaymentTerms>\n  <cac:TaxTotal>\n    <cbc:TaxAmount currencyID=\"EUR\">59.82</cbc:TaxAmount>\n    <cac:TaxSubtotal>\n      <cbc:TaxableAmount currencyID=\"EUR\">314.86</cbc:TaxableAmount>\n      <cbc:TaxAmount currencyID=\"EUR\">59.82</cbc:TaxAmount>\n      <cac:TaxCategory>\n        <cbc:ID>S</cbc:ID>\n        <cbc:Percent>19</cbc:Percent>\n        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>\n      </cac:TaxCategory>\n    </cac:TaxSubtotal>\n  </cac:TaxTotal>\n  <cac:LegalMonetaryTotal>\n    <cbc:LineExtensionAmount currencyID=\"EUR\">314.86</cbc:LineExtensionAmount>\n    <cbc:TaxExclusiveAmount currencyID=\"EUR\">314.86</cbc:TaxExclusiveAmount>\n    <cbc:TaxInclusiveAmount currencyID=\"EUR\">374.68</cbc:TaxInclusiveAmount>\n    <cbc:PayableAmount currencyID=\"EUR\">374.68</cbc:PayableAmount>\n  </cac:LegalMonetaryTotal>\n  <cac:InvoiceLine>\n    <cbc:ID>1</cbc:ID>\n    <cbc:InvoicedQuantity unitCode=\"HUR\">3.5</cbc:InvoicedQuantity>\n    <cbc:LineExtensionAmount currencyID=\"EUR\">314.86</cbc:LineExtensionAmount>\n    <cac:Item>\n      <cbc:Name>Wartung Lüftungsanlage</cbc:Name>\n      <cac:ClassifiedTaxCategory>\n        <cbc:ID>S</cbc:ID>\n        <cbc:Percent>19</cbc:Percent>\n        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>\n      </cac:ClassifiedTaxCategory>\n    </cac:Item>\n    <cac:Price><cbc:PriceAmount currencyID=\"EUR\">89.96</cbc:PriceAmount></cac:Price>\n  </cac:InvoiceLine>\n</Invoice>",
+          "options": {
+            "raw": {
+              "language": "xml"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "2 · Validation report only",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/xml"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/v1/validate?lang=en",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "v1",
+            "validate"
+          ],
+          "query": [
+            {
+              "key": "lang",
+              "value": "en",
+              "description": "Language of the fix hints: en, de, pl, it, fr."
+            }
+          ]
+        },
+        "description": "The findings without the invoice body — official rule sets (EN 16931, XRechnung/KoSIT, Peppol, FatturaPA, KSeF) plus arithmetic cross-checks, each with the field and a fix.",
+        "body": {
+          "mode": "raw",
+          "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Invoice xmlns=\"urn:oasis:names:specification:ubl:schema:xsd:Invoice-2\"\n         xmlns:cac=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\"\n         xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\">\n  <cbc:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0</cbc:CustomizationID>\n  <cbc:ProfileID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</cbc:ProfileID>\n  <cbc:ID>RE-2026-0421</cbc:ID>\n  <cbc:IssueDate>2026-08-30</cbc:IssueDate>\n  <cbc:DueDate>2026-09-29</cbc:DueDate>\n  <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>\n  <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>\n  <cbc:BuyerReference>04011000-12345-03</cbc:BuyerReference>\n  <cac:AccountingSupplierParty>\n    <cac:Party>\n      <cbc:EndpointID schemeID=\"EM\">rechnung@nordlicht-werkstatt.de</cbc:EndpointID>\n      <cac:PostalAddress>\n        <cbc:StreetName>Kanalstraße 12</cbc:StreetName>\n        <cbc:CityName>Kiel</cbc:CityName>\n        <cbc:PostalZone>24103</cbc:PostalZone>\n        <cac:Country><cbc:IdentificationCode>DE</cbc:IdentificationCode></cac:Country>\n      </cac:PostalAddress>\n      <cac:PartyTaxScheme>\n        <cbc:CompanyID>DE123456789</cbc:CompanyID>\n        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>\n      </cac:PartyTaxScheme>\n      <cac:PartyLegalEntity>\n        <cbc:RegistrationName>Nordlicht Werkstatt GmbH</cbc:RegistrationName>\n      </cac:PartyLegalEntity>\n      <cac:Contact>\n        <cbc:Name>Buchhaltung</cbc:Name>\n        <cbc:Telephone>+49 431 0000000</cbc:Telephone>\n        <cbc:ElectronicMail>rechnung@nordlicht-werkstatt.de</cbc:ElectronicMail>\n      </cac:Contact>\n    </cac:Party>\n  </cac:AccountingSupplierParty>\n  <cac:AccountingCustomerParty>\n    <cac:Party>\n      <cbc:EndpointID schemeID=\"EM\">ap@beispiel-bau.de</cbc:EndpointID>\n      <cac:PostalAddress>\n        <cbc:StreetName>Hafenweg 3</cbc:StreetName>\n        <cbc:CityName>Hamburg</cbc:CityName>\n        <cbc:PostalZone>20095</cbc:PostalZone>\n        <cac:Country><cbc:IdentificationCode>DE</cbc:IdentificationCode></cac:Country>\n      </cac:PostalAddress>\n      <cac:PartyLegalEntity>\n        <cbc:RegistrationName>Beispiel Bau AG</cbc:RegistrationName>\n      </cac:PartyLegalEntity>\n    </cac:Party>\n  </cac:AccountingCustomerParty>\n  <cac:PaymentMeans>\n    <cbc:PaymentMeansCode>58</cbc:PaymentMeansCode>\n    <cac:PayeeFinancialAccount>\n      <cbc:ID>DE02120300000000202051</cbc:ID>\n      <cbc:Name>Nordlicht Werkstatt GmbH</cbc:Name>\n    </cac:PayeeFinancialAccount>\n  </cac:PaymentMeans>\n  <cac:PaymentTerms><cbc:Note>Zahlbar innerhalb 30 Tagen ohne Abzug.</cbc:Note></cac:PaymentTerms>\n  <cac:TaxTotal>\n    <cbc:TaxAmount currencyID=\"EUR\">59.82</cbc:TaxAmount>\n    <cac:TaxSubtotal>\n      <cbc:TaxableAmount currencyID=\"EUR\">314.86</cbc:TaxableAmount>\n      <cbc:TaxAmount currencyID=\"EUR\">59.82</cbc:TaxAmount>\n      <cac:TaxCategory>\n        <cbc:ID>S</cbc:ID>\n        <cbc:Percent>19</cbc:Percent>\n        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>\n      </cac:TaxCategory>\n    </cac:TaxSubtotal>\n  </cac:TaxTotal>\n  <cac:LegalMonetaryTotal>\n    <cbc:LineExtensionAmount currencyID=\"EUR\">314.86</cbc:LineExtensionAmount>\n    <cbc:TaxExclusiveAmount currencyID=\"EUR\">314.86</cbc:TaxExclusiveAmount>\n    <cbc:TaxInclusiveAmount currencyID=\"EUR\">374.68</cbc:TaxInclusiveAmount>\n    <cbc:PayableAmount currencyID=\"EUR\">374.68</cbc:PayableAmount>\n  </cac:LegalMonetaryTotal>\n  <cac:InvoiceLine>\n    <cbc:ID>1</cbc:ID>\n    <cbc:InvoicedQuantity unitCode=\"HUR\">3.5</cbc:InvoicedQuantity>\n    <cbc:LineExtensionAmount currencyID=\"EUR\">314.86</cbc:LineExtensionAmount>\n    <cac:Item>\n      <cbc:Name>Wartung Lüftungsanlage</cbc:Name>\n      <cac:ClassifiedTaxCategory>\n        <cbc:ID>S</cbc:ID>\n        <cbc:Percent>19</cbc:Percent>\n        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>\n      </cac:ClassifiedTaxCategory>\n    </cac:Item>\n    <cac:Price><cbc:PriceAmount currencyID=\"EUR\">89.96</cbc:PriceAmount></cac:Price>\n  </cac:InvoiceLine>\n</Invoice>",
+          "options": {
+            "raw": {
+              "language": "xml"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "3 · Canonical JSON only",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/xml"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/v1/parse",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "v1",
+            "parse"
+          ]
+        },
+        "description": "The invoice as one shape for every input syntax, fields named by the semantic model (BT/BG numbers). No validation, so it is the fastest call.",
+        "body": {
+          "mode": "raw",
+          "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Invoice xmlns=\"urn:oasis:names:specification:ubl:schema:xsd:Invoice-2\"\n         xmlns:cac=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\"\n         xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\">\n  <cbc:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0</cbc:CustomizationID>\n  <cbc:ProfileID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</cbc:ProfileID>\n  <cbc:ID>RE-2026-0421</cbc:ID>\n  <cbc:IssueDate>2026-08-30</cbc:IssueDate>\n  <cbc:DueDate>2026-09-29</cbc:DueDate>\n  <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>\n  <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>\n  <cbc:BuyerReference>04011000-12345-03</cbc:BuyerReference>\n  <cac:AccountingSupplierParty>\n    <cac:Party>\n      <cbc:EndpointID schemeID=\"EM\">rechnung@nordlicht-werkstatt.de</cbc:EndpointID>\n      <cac:PostalAddress>\n        <cbc:StreetName>Kanalstraße 12</cbc:StreetName>\n        <cbc:CityName>Kiel</cbc:CityName>\n        <cbc:PostalZone>24103</cbc:PostalZone>\n        <cac:Country><cbc:IdentificationCode>DE</cbc:IdentificationCode></cac:Country>\n      </cac:PostalAddress>\n      <cac:PartyTaxScheme>\n        <cbc:CompanyID>DE123456789</cbc:CompanyID>\n        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>\n      </cac:PartyTaxScheme>\n      <cac:PartyLegalEntity>\n        <cbc:RegistrationName>Nordlicht Werkstatt GmbH</cbc:RegistrationName>\n      </cac:PartyLegalEntity>\n      <cac:Contact>\n        <cbc:Name>Buchhaltung</cbc:Name>\n        <cbc:Telephone>+49 431 0000000</cbc:Telephone>\n        <cbc:ElectronicMail>rechnung@nordlicht-werkstatt.de</cbc:ElectronicMail>\n      </cac:Contact>\n    </cac:Party>\n  </cac:AccountingSupplierParty>\n  <cac:AccountingCustomerParty>\n    <cac:Party>\n      <cbc:EndpointID schemeID=\"EM\">ap@beispiel-bau.de</cbc:EndpointID>\n      <cac:PostalAddress>\n        <cbc:StreetName>Hafenweg 3</cbc:StreetName>\n        <cbc:CityName>Hamburg</cbc:CityName>\n        <cbc:PostalZone>20095</cbc:PostalZone>\n        <cac:Country><cbc:IdentificationCode>DE</cbc:IdentificationCode></cac:Country>\n      </cac:PostalAddress>\n      <cac:PartyLegalEntity>\n        <cbc:RegistrationName>Beispiel Bau AG</cbc:RegistrationName>\n      </cac:PartyLegalEntity>\n    </cac:Party>\n  </cac:AccountingCustomerParty>\n  <cac:PaymentMeans>\n    <cbc:PaymentMeansCode>58</cbc:PaymentMeansCode>\n    <cac:PayeeFinancialAccount>\n      <cbc:ID>DE02120300000000202051</cbc:ID>\n      <cbc:Name>Nordlicht Werkstatt GmbH</cbc:Name>\n    </cac:PayeeFinancialAccount>\n  </cac:PaymentMeans>\n  <cac:PaymentTerms><cbc:Note>Zahlbar innerhalb 30 Tagen ohne Abzug.</cbc:Note></cac:PaymentTerms>\n  <cac:TaxTotal>\n    <cbc:TaxAmount currencyID=\"EUR\">59.82</cbc:TaxAmount>\n    <cac:TaxSubtotal>\n      <cbc:TaxableAmount currencyID=\"EUR\">314.86</cbc:TaxableAmount>\n      <cbc:TaxAmount currencyID=\"EUR\">59.82</cbc:TaxAmount>\n      <cac:TaxCategory>\n        <cbc:ID>S</cbc:ID>\n        <cbc:Percent>19</cbc:Percent>\n        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>\n      </cac:TaxCategory>\n    </cac:TaxSubtotal>\n  </cac:TaxTotal>\n  <cac:LegalMonetaryTotal>\n    <cbc:LineExtensionAmount currencyID=\"EUR\">314.86</cbc:LineExtensionAmount>\n    <cbc:TaxExclusiveAmount currencyID=\"EUR\">314.86</cbc:TaxExclusiveAmount>\n    <cbc:TaxInclusiveAmount currencyID=\"EUR\">374.68</cbc:TaxInclusiveAmount>\n    <cbc:PayableAmount currencyID=\"EUR\">374.68</cbc:PayableAmount>\n  </cac:LegalMonetaryTotal>\n  <cac:InvoiceLine>\n    <cbc:ID>1</cbc:ID>\n    <cbc:InvoicedQuantity unitCode=\"HUR\">3.5</cbc:InvoicedQuantity>\n    <cbc:LineExtensionAmount currencyID=\"EUR\">314.86</cbc:LineExtensionAmount>\n    <cac:Item>\n      <cbc:Name>Wartung Lüftungsanlage</cbc:Name>\n      <cac:ClassifiedTaxCategory>\n        <cbc:ID>S</cbc:ID>\n        <cbc:Percent>19</cbc:Percent>\n        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>\n      </cac:ClassifiedTaxCategory>\n    </cac:Item>\n    <cac:Price><cbc:PriceAmount currencyID=\"EUR\">89.96</cbc:PriceAmount></cac:Price>\n  </cac:InvoiceLine>\n</Invoice>",
+          "options": {
+            "raw": {
+              "language": "xml"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "4 · Human-readable HTML",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/xml"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/v1/render.html?lang=en",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "v1",
+            "render.html"
+          ],
+          "query": [
+            {
+              "key": "lang",
+              "value": "en",
+              "description": "Language of the fix hints: en, de, pl, it, fr."
+            }
+          ]
+        },
+        "description": "The same A4 layout for every syntax — for an approver who wants to see the invoice rather than the XML.",
+        "body": {
+          "mode": "raw",
+          "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Invoice xmlns=\"urn:oasis:names:specification:ubl:schema:xsd:Invoice-2\"\n         xmlns:cac=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\"\n         xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\">\n  <cbc:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0</cbc:CustomizationID>\n  <cbc:ProfileID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</cbc:ProfileID>\n  <cbc:ID>RE-2026-0421</cbc:ID>\n  <cbc:IssueDate>2026-08-30</cbc:IssueDate>\n  <cbc:DueDate>2026-09-29</cbc:DueDate>\n  <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>\n  <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>\n  <cbc:BuyerReference>04011000-12345-03</cbc:BuyerReference>\n  <cac:AccountingSupplierParty>\n    <cac:Party>\n      <cbc:EndpointID schemeID=\"EM\">rechnung@nordlicht-werkstatt.de</cbc:EndpointID>\n      <cac:PostalAddress>\n        <cbc:StreetName>Kanalstraße 12</cbc:StreetName>\n        <cbc:CityName>Kiel</cbc:CityName>\n        <cbc:PostalZone>24103</cbc:PostalZone>\n        <cac:Country><cbc:IdentificationCode>DE</cbc:IdentificationCode></cac:Country>\n      </cac:PostalAddress>\n      <cac:PartyTaxScheme>\n        <cbc:CompanyID>DE123456789</cbc:CompanyID>\n        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>\n      </cac:PartyTaxScheme>\n      <cac:PartyLegalEntity>\n        <cbc:RegistrationName>Nordlicht Werkstatt GmbH</cbc:RegistrationName>\n      </cac:PartyLegalEntity>\n      <cac:Contact>\n        <cbc:Name>Buchhaltung</cbc:Name>\n        <cbc:Telephone>+49 431 0000000</cbc:Telephone>\n        <cbc:ElectronicMail>rechnung@nordlicht-werkstatt.de</cbc:ElectronicMail>\n      </cac:Contact>\n    </cac:Party>\n  </cac:AccountingSupplierParty>\n  <cac:AccountingCustomerParty>\n    <cac:Party>\n      <cbc:EndpointID schemeID=\"EM\">ap@beispiel-bau.de</cbc:EndpointID>\n      <cac:PostalAddress>\n        <cbc:StreetName>Hafenweg 3</cbc:StreetName>\n        <cbc:CityName>Hamburg</cbc:CityName>\n        <cbc:PostalZone>20095</cbc:PostalZone>\n        <cac:Country><cbc:IdentificationCode>DE</cbc:IdentificationCode></cac:Country>\n      </cac:PostalAddress>\n      <cac:PartyLegalEntity>\n        <cbc:RegistrationName>Beispiel Bau AG</cbc:RegistrationName>\n      </cac:PartyLegalEntity>\n    </cac:Party>\n  </cac:AccountingCustomerParty>\n  <cac:PaymentMeans>\n    <cbc:PaymentMeansCode>58</cbc:PaymentMeansCode>\n    <cac:PayeeFinancialAccount>\n      <cbc:ID>DE02120300000000202051</cbc:ID>\n      <cbc:Name>Nordlicht Werkstatt GmbH</cbc:Name>\n    </cac:PayeeFinancialAccount>\n  </cac:PaymentMeans>\n  <cac:PaymentTerms><cbc:Note>Zahlbar innerhalb 30 Tagen ohne Abzug.</cbc:Note></cac:PaymentTerms>\n  <cac:TaxTotal>\n    <cbc:TaxAmount currencyID=\"EUR\">59.82</cbc:TaxAmount>\n    <cac:TaxSubtotal>\n      <cbc:TaxableAmount currencyID=\"EUR\">314.86</cbc:TaxableAmount>\n      <cbc:TaxAmount currencyID=\"EUR\">59.82</cbc:TaxAmount>\n      <cac:TaxCategory>\n        <cbc:ID>S</cbc:ID>\n        <cbc:Percent>19</cbc:Percent>\n        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>\n      </cac:TaxCategory>\n    </cac:TaxSubtotal>\n  </cac:TaxTotal>\n  <cac:LegalMonetaryTotal>\n    <cbc:LineExtensionAmount currencyID=\"EUR\">314.86</cbc:LineExtensionAmount>\n    <cbc:TaxExclusiveAmount currencyID=\"EUR\">314.86</cbc:TaxExclusiveAmount>\n    <cbc:TaxInclusiveAmount currencyID=\"EUR\">374.68</cbc:TaxInclusiveAmount>\n    <cbc:PayableAmount currencyID=\"EUR\">374.68</cbc:PayableAmount>\n  </cac:LegalMonetaryTotal>\n  <cac:InvoiceLine>\n    <cbc:ID>1</cbc:ID>\n    <cbc:InvoicedQuantity unitCode=\"HUR\">3.5</cbc:InvoicedQuantity>\n    <cbc:LineExtensionAmount currencyID=\"EUR\">314.86</cbc:LineExtensionAmount>\n    <cac:Item>\n      <cbc:Name>Wartung Lüftungsanlage</cbc:Name>\n      <cac:ClassifiedTaxCategory>\n        <cbc:ID>S</cbc:ID>\n        <cbc:Percent>19</cbc:Percent>\n        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>\n      </cac:ClassifiedTaxCategory>\n    </cac:Item>\n    <cac:Price><cbc:PriceAmount currencyID=\"EUR\">89.96</cbc:PriceAmount></cac:Price>\n  </cac:InvoiceLine>\n</Invoice>",
+          "options": {
+            "raw": {
+              "language": "xml"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "5 · Human-readable PDF",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/xml"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/v1/render.pdf?lang=en",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "v1",
+            "render.pdf"
+          ],
+          "query": [
+            {
+              "key": "lang",
+              "value": "en",
+              "description": "Language of the fix hints: en, de, pl, it, fr."
+            }
+          ]
+        },
+        "description": "As above, as a PDF/A4 file.",
+        "body": {
+          "mode": "raw",
+          "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Invoice xmlns=\"urn:oasis:names:specification:ubl:schema:xsd:Invoice-2\"\n         xmlns:cac=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\"\n         xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\">\n  <cbc:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0</cbc:CustomizationID>\n  <cbc:ProfileID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</cbc:ProfileID>\n  <cbc:ID>RE-2026-0421</cbc:ID>\n  <cbc:IssueDate>2026-08-30</cbc:IssueDate>\n  <cbc:DueDate>2026-09-29</cbc:DueDate>\n  <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>\n  <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>\n  <cbc:BuyerReference>04011000-12345-03</cbc:BuyerReference>\n  <cac:AccountingSupplierParty>\n    <cac:Party>\n      <cbc:EndpointID schemeID=\"EM\">rechnung@nordlicht-werkstatt.de</cbc:EndpointID>\n      <cac:PostalAddress>\n        <cbc:StreetName>Kanalstraße 12</cbc:StreetName>\n        <cbc:CityName>Kiel</cbc:CityName>\n        <cbc:PostalZone>24103</cbc:PostalZone>\n        <cac:Country><cbc:IdentificationCode>DE</cbc:IdentificationCode></cac:Country>\n      </cac:PostalAddress>\n      <cac:PartyTaxScheme>\n        <cbc:CompanyID>DE123456789</cbc:CompanyID>\n        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>\n      </cac:PartyTaxScheme>\n      <cac:PartyLegalEntity>\n        <cbc:RegistrationName>Nordlicht Werkstatt GmbH</cbc:RegistrationName>\n      </cac:PartyLegalEntity>\n      <cac:Contact>\n        <cbc:Name>Buchhaltung</cbc:Name>\n        <cbc:Telephone>+49 431 0000000</cbc:Telephone>\n        <cbc:ElectronicMail>rechnung@nordlicht-werkstatt.de</cbc:ElectronicMail>\n      </cac:Contact>\n    </cac:Party>\n  </cac:AccountingSupplierParty>\n  <cac:AccountingCustomerParty>\n    <cac:Party>\n      <cbc:EndpointID schemeID=\"EM\">ap@beispiel-bau.de</cbc:EndpointID>\n      <cac:PostalAddress>\n        <cbc:StreetName>Hafenweg 3</cbc:StreetName>\n        <cbc:CityName>Hamburg</cbc:CityName>\n        <cbc:PostalZone>20095</cbc:PostalZone>\n        <cac:Country><cbc:IdentificationCode>DE</cbc:IdentificationCode></cac:Country>\n      </cac:PostalAddress>\n      <cac:PartyLegalEntity>\n        <cbc:RegistrationName>Beispiel Bau AG</cbc:RegistrationName>\n      </cac:PartyLegalEntity>\n    </cac:Party>\n  </cac:AccountingCustomerParty>\n  <cac:PaymentMeans>\n    <cbc:PaymentMeansCode>58</cbc:PaymentMeansCode>\n    <cac:PayeeFinancialAccount>\n      <cbc:ID>DE02120300000000202051</cbc:ID>\n      <cbc:Name>Nordlicht Werkstatt GmbH</cbc:Name>\n    </cac:PayeeFinancialAccount>\n  </cac:PaymentMeans>\n  <cac:PaymentTerms><cbc:Note>Zahlbar innerhalb 30 Tagen ohne Abzug.</cbc:Note></cac:PaymentTerms>\n  <cac:TaxTotal>\n    <cbc:TaxAmount currencyID=\"EUR\">59.82</cbc:TaxAmount>\n    <cac:TaxSubtotal>\n      <cbc:TaxableAmount currencyID=\"EUR\">314.86</cbc:TaxableAmount>\n      <cbc:TaxAmount currencyID=\"EUR\">59.82</cbc:TaxAmount>\n      <cac:TaxCategory>\n        <cbc:ID>S</cbc:ID>\n        <cbc:Percent>19</cbc:Percent>\n        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>\n      </cac:TaxCategory>\n    </cac:TaxSubtotal>\n  </cac:TaxTotal>\n  <cac:LegalMonetaryTotal>\n    <cbc:LineExtensionAmount currencyID=\"EUR\">314.86</cbc:LineExtensionAmount>\n    <cbc:TaxExclusiveAmount currencyID=\"EUR\">314.86</cbc:TaxExclusiveAmount>\n    <cbc:TaxInclusiveAmount currencyID=\"EUR\">374.68</cbc:TaxInclusiveAmount>\n    <cbc:PayableAmount currencyID=\"EUR\">374.68</cbc:PayableAmount>\n  </cac:LegalMonetaryTotal>\n  <cac:InvoiceLine>\n    <cbc:ID>1</cbc:ID>\n    <cbc:InvoicedQuantity unitCode=\"HUR\">3.5</cbc:InvoicedQuantity>\n    <cbc:LineExtensionAmount currencyID=\"EUR\">314.86</cbc:LineExtensionAmount>\n    <cac:Item>\n      <cbc:Name>Wartung Lüftungsanlage</cbc:Name>\n      <cac:ClassifiedTaxCategory>\n        <cbc:ID>S</cbc:ID>\n        <cbc:Percent>19</cbc:Percent>\n        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>\n      </cac:ClassifiedTaxCategory>\n    </cac:Item>\n    <cac:Price><cbc:PriceAmount currencyID=\"EUR\">89.96</cbc:PriceAmount></cac:Price>\n  </cac:InvoiceLine>\n</Invoice>",
+          "options": {
+            "raw": {
+              "language": "xml"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "6 · CSV export",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/xml"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/v1/export.csv?level=lines",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "v1",
+            "export.csv"
+          ],
+          "query": [
+            {
+              "key": "level",
+              "value": "lines",
+              "description": "lines or documents"
+            }
+          ]
+        },
+        "description": "Flat CSV — one row per line item, or one per document with level=documents.",
+        "body": {
+          "mode": "raw",
+          "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Invoice xmlns=\"urn:oasis:names:specification:ubl:schema:xsd:Invoice-2\"\n         xmlns:cac=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\"\n         xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\">\n  <cbc:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0</cbc:CustomizationID>\n  <cbc:ProfileID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</cbc:ProfileID>\n  <cbc:ID>RE-2026-0421</cbc:ID>\n  <cbc:IssueDate>2026-08-30</cbc:IssueDate>\n  <cbc:DueDate>2026-09-29</cbc:DueDate>\n  <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>\n  <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>\n  <cbc:BuyerReference>04011000-12345-03</cbc:BuyerReference>\n  <cac:AccountingSupplierParty>\n    <cac:Party>\n      <cbc:EndpointID schemeID=\"EM\">rechnung@nordlicht-werkstatt.de</cbc:EndpointID>\n      <cac:PostalAddress>\n        <cbc:StreetName>Kanalstraße 12</cbc:StreetName>\n        <cbc:CityName>Kiel</cbc:CityName>\n        <cbc:PostalZone>24103</cbc:PostalZone>\n        <cac:Country><cbc:IdentificationCode>DE</cbc:IdentificationCode></cac:Country>\n      </cac:PostalAddress>\n      <cac:PartyTaxScheme>\n        <cbc:CompanyID>DE123456789</cbc:CompanyID>\n        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>\n      </cac:PartyTaxScheme>\n      <cac:PartyLegalEntity>\n        <cbc:RegistrationName>Nordlicht Werkstatt GmbH</cbc:RegistrationName>\n      </cac:PartyLegalEntity>\n      <cac:Contact>\n        <cbc:Name>Buchhaltung</cbc:Name>\n        <cbc:Telephone>+49 431 0000000</cbc:Telephone>\n        <cbc:ElectronicMail>rechnung@nordlicht-werkstatt.de</cbc:ElectronicMail>\n      </cac:Contact>\n    </cac:Party>\n  </cac:AccountingSupplierParty>\n  <cac:AccountingCustomerParty>\n    <cac:Party>\n      <cbc:EndpointID schemeID=\"EM\">ap@beispiel-bau.de</cbc:EndpointID>\n      <cac:PostalAddress>\n        <cbc:StreetName>Hafenweg 3</cbc:StreetName>\n        <cbc:CityName>Hamburg</cbc:CityName>\n        <cbc:PostalZone>20095</cbc:PostalZone>\n        <cac:Country><cbc:IdentificationCode>DE</cbc:IdentificationCode></cac:Country>\n      </cac:PostalAddress>\n      <cac:PartyLegalEntity>\n        <cbc:RegistrationName>Beispiel Bau AG</cbc:RegistrationName>\n      </cac:PartyLegalEntity>\n    </cac:Party>\n  </cac:AccountingCustomerParty>\n  <cac:PaymentMeans>\n    <cbc:PaymentMeansCode>58</cbc:PaymentMeansCode>\n    <cac:PayeeFinancialAccount>\n      <cbc:ID>DE02120300000000202051</cbc:ID>\n      <cbc:Name>Nordlicht Werkstatt GmbH</cbc:Name>\n    </cac:PayeeFinancialAccount>\n  </cac:PaymentMeans>\n  <cac:PaymentTerms><cbc:Note>Zahlbar innerhalb 30 Tagen ohne Abzug.</cbc:Note></cac:PaymentTerms>\n  <cac:TaxTotal>\n    <cbc:TaxAmount currencyID=\"EUR\">59.82</cbc:TaxAmount>\n    <cac:TaxSubtotal>\n      <cbc:TaxableAmount currencyID=\"EUR\">314.86</cbc:TaxableAmount>\n      <cbc:TaxAmount currencyID=\"EUR\">59.82</cbc:TaxAmount>\n      <cac:TaxCategory>\n        <cbc:ID>S</cbc:ID>\n        <cbc:Percent>19</cbc:Percent>\n        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>\n      </cac:TaxCategory>\n    </cac:TaxSubtotal>\n  </cac:TaxTotal>\n  <cac:LegalMonetaryTotal>\n    <cbc:LineExtensionAmount currencyID=\"EUR\">314.86</cbc:LineExtensionAmount>\n    <cbc:TaxExclusiveAmount currencyID=\"EUR\">314.86</cbc:TaxExclusiveAmount>\n    <cbc:TaxInclusiveAmount currencyID=\"EUR\">374.68</cbc:TaxInclusiveAmount>\n    <cbc:PayableAmount currencyID=\"EUR\">374.68</cbc:PayableAmount>\n  </cac:LegalMonetaryTotal>\n  <cac:InvoiceLine>\n    <cbc:ID>1</cbc:ID>\n    <cbc:InvoicedQuantity unitCode=\"HUR\">3.5</cbc:InvoicedQuantity>\n    <cbc:LineExtensionAmount currencyID=\"EUR\">314.86</cbc:LineExtensionAmount>\n    <cac:Item>\n      <cbc:Name>Wartung Lüftungsanlage</cbc:Name>\n      <cac:ClassifiedTaxCategory>\n        <cbc:ID>S</cbc:ID>\n        <cbc:Percent>19</cbc:Percent>\n        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>\n      </cac:ClassifiedTaxCategory>\n    </cac:Item>\n    <cac:Price><cbc:PriceAmount currencyID=\"EUR\">89.96</cbc:PriceAmount></cac:Price>\n  </cac:InvoiceLine>\n</Invoice>",
+          "options": {
+            "raw": {
+              "language": "xml"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "7 · DATEV Buchungsstapel",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/xml"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/v1/export.datev?skr=03&creditor_account=70000",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "v1",
+            "export.datev"
+          ],
+          "query": [
+            {
+              "key": "skr",
+              "value": "03",
+              "description": "Chart of accounts: 03 or 04."
+            },
+            {
+              "key": "creditor_account",
+              "value": "70000",
+              "description": "Creditor account number, 4-9 digits."
+            }
+          ]
+        },
+        "description": "EXTF 700 booking batch (cp1252) for the incoming invoice.",
+        "body": {
+          "mode": "raw",
+          "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Invoice xmlns=\"urn:oasis:names:specification:ubl:schema:xsd:Invoice-2\"\n         xmlns:cac=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\"\n         xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\">\n  <cbc:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0</cbc:CustomizationID>\n  <cbc:ProfileID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</cbc:ProfileID>\n  <cbc:ID>RE-2026-0421</cbc:ID>\n  <cbc:IssueDate>2026-08-30</cbc:IssueDate>\n  <cbc:DueDate>2026-09-29</cbc:DueDate>\n  <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>\n  <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>\n  <cbc:BuyerReference>04011000-12345-03</cbc:BuyerReference>\n  <cac:AccountingSupplierParty>\n    <cac:Party>\n      <cbc:EndpointID schemeID=\"EM\">rechnung@nordlicht-werkstatt.de</cbc:EndpointID>\n      <cac:PostalAddress>\n        <cbc:StreetName>Kanalstraße 12</cbc:StreetName>\n        <cbc:CityName>Kiel</cbc:CityName>\n        <cbc:PostalZone>24103</cbc:PostalZone>\n        <cac:Country><cbc:IdentificationCode>DE</cbc:IdentificationCode></cac:Country>\n      </cac:PostalAddress>\n      <cac:PartyTaxScheme>\n        <cbc:CompanyID>DE123456789</cbc:CompanyID>\n        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>\n      </cac:PartyTaxScheme>\n      <cac:PartyLegalEntity>\n        <cbc:RegistrationName>Nordlicht Werkstatt GmbH</cbc:RegistrationName>\n      </cac:PartyLegalEntity>\n      <cac:Contact>\n        <cbc:Name>Buchhaltung</cbc:Name>\n        <cbc:Telephone>+49 431 0000000</cbc:Telephone>\n        <cbc:ElectronicMail>rechnung@nordlicht-werkstatt.de</cbc:ElectronicMail>\n      </cac:Contact>\n    </cac:Party>\n  </cac:AccountingSupplierParty>\n  <cac:AccountingCustomerParty>\n    <cac:Party>\n      <cbc:EndpointID schemeID=\"EM\">ap@beispiel-bau.de</cbc:EndpointID>\n      <cac:PostalAddress>\n        <cbc:StreetName>Hafenweg 3</cbc:StreetName>\n        <cbc:CityName>Hamburg</cbc:CityName>\n        <cbc:PostalZone>20095</cbc:PostalZone>\n        <cac:Country><cbc:IdentificationCode>DE</cbc:IdentificationCode></cac:Country>\n      </cac:PostalAddress>\n      <cac:PartyLegalEntity>\n        <cbc:RegistrationName>Beispiel Bau AG</cbc:RegistrationName>\n      </cac:PartyLegalEntity>\n    </cac:Party>\n  </cac:AccountingCustomerParty>\n  <cac:PaymentMeans>\n    <cbc:PaymentMeansCode>58</cbc:PaymentMeansCode>\n    <cac:PayeeFinancialAccount>\n      <cbc:ID>DE02120300000000202051</cbc:ID>\n      <cbc:Name>Nordlicht Werkstatt GmbH</cbc:Name>\n    </cac:PayeeFinancialAccount>\n  </cac:PaymentMeans>\n  <cac:PaymentTerms><cbc:Note>Zahlbar innerhalb 30 Tagen ohne Abzug.</cbc:Note></cac:PaymentTerms>\n  <cac:TaxTotal>\n    <cbc:TaxAmount currencyID=\"EUR\">59.82</cbc:TaxAmount>\n    <cac:TaxSubtotal>\n      <cbc:TaxableAmount currencyID=\"EUR\">314.86</cbc:TaxableAmount>\n      <cbc:TaxAmount currencyID=\"EUR\">59.82</cbc:TaxAmount>\n      <cac:TaxCategory>\n        <cbc:ID>S</cbc:ID>\n        <cbc:Percent>19</cbc:Percent>\n        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>\n      </cac:TaxCategory>\n    </cac:TaxSubtotal>\n  </cac:TaxTotal>\n  <cac:LegalMonetaryTotal>\n    <cbc:LineExtensionAmount currencyID=\"EUR\">314.86</cbc:LineExtensionAmount>\n    <cbc:TaxExclusiveAmount currencyID=\"EUR\">314.86</cbc:TaxExclusiveAmount>\n    <cbc:TaxInclusiveAmount currencyID=\"EUR\">374.68</cbc:TaxInclusiveAmount>\n    <cbc:PayableAmount currencyID=\"EUR\">374.68</cbc:PayableAmount>\n  </cac:LegalMonetaryTotal>\n  <cac:InvoiceLine>\n    <cbc:ID>1</cbc:ID>\n    <cbc:InvoicedQuantity unitCode=\"HUR\">3.5</cbc:InvoicedQuantity>\n    <cbc:LineExtensionAmount currencyID=\"EUR\">314.86</cbc:LineExtensionAmount>\n    <cac:Item>\n      <cbc:Name>Wartung Lüftungsanlage</cbc:Name>\n      <cac:ClassifiedTaxCategory>\n        <cbc:ID>S</cbc:ID>\n        <cbc:Percent>19</cbc:Percent>\n        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>\n      </cac:ClassifiedTaxCategory>\n    </cac:Item>\n    <cac:Price><cbc:PriceAmount currencyID=\"EUR\">89.96</cbc:PriceAmount></cac:Price>\n  </cac:InvoiceLine>\n</Invoice>",
+          "options": {
+            "raw": {
+              "language": "xml"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "8 · Supported formats",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/v1/formats",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "v1",
+            "formats"
+          ]
+        },
+        "description": "Every input format and rule-set version currently accepted, plus the languages the fix hints are available in."
+      }
+    },
+    {
+      "name": "9 · Explain a rule id",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/v1/rules/BR-DE-1?lang=en",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "v1",
+            "rules",
+            "BR-DE-1"
+          ],
+          "query": [
+            {
+              "key": "lang",
+              "value": "en",
+              "description": "Language of the fix hints: en, de, pl, it, fr."
+            }
+          ]
+        },
+        "description": "Plain-language explanation for any rule id from a validation report — the same text that backs invoicein.peculiar.systems/rules."
+      }
+    },
+    {
+      "name": "10 · Canonical field guide",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/v1/schema",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "v1",
+            "schema"
+          ]
+        },
+        "description": "Every field of the canonical JSON with its BT/BG number."
+      }
+    }
+  ]
+}
