@@ -1,2 +1,5 @@
 out.pdf
 .DS_Store
+__pycache__/
+*.py[cod]
+.DS_Store
