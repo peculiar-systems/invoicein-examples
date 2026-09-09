@@ -1,5 +1,8 @@
 # InvoiceIn — examples
 
+[![MCP server rated A on Glama](https://glama.ai/mcp/servers/peculiar-systems/invoicein-examples/badges/score.svg)](https://glama.ai/mcp/servers/peculiar-systems/invoicein-examples)
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://www.postman.com/peculiar-systems-3265262/peculiar-systems/collection/4xkrtoq/invoicein-inbound-e-invoice-api)
+
 **Any European e-invoice a business *receives* → one canonical EN 16931 JSON, a validation report with plain-language fix hints, a PDF, CSV or DATEV export.** One stateless endpoint, nothing stored.
 
 Accepts: XRechnung (UBL and CII), EN 16931 UBL 2.1 Invoice/CreditNote, Peppol BIS Billing 3, CII D16B, ZUGFeRD 1.0 / 2.x and Factur-X hybrid PDFs, Italy's FatturaPA 1.2, Poland's KSeF FA(2)/FA(3).
