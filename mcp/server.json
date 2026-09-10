@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.peculiar-systems/invoicein",
   "title": "InvoiceIn",
-  "description": "Any EU e-invoice (XRechnung, ZUGFeRD/Factur-X, Peppol, FatturaPA, KSeF) → EN 16931 JSON + fix hints",
+  "description": "XRechnung, Factur-X, Peppol, FatturaPA, KSeF → EN 16931 JSON + fix hints. Hosted; MIT=examples only",
   "icons": [
     {
       "src": "https://raw.githubusercontent.com/peculiar-systems/invoicein-examples/main/icon.png",
@@ -17,7 +17,7 @@
     "url": "https://github.com/peculiar-systems/invoicein-examples",
     "source": "github"
   },
-  "version": "0.1.1",
+  "version": "0.1.2",
   "websiteUrl": "https://invoicein.peculiar.systems",
   "remotes": [
     {
