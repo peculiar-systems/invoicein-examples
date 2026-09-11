@@ -15,6 +15,10 @@ Accepts: XRechnung (UBL and CII), EN 16931 UBL 2.1 Invoice/CreditNote, Peppol BI
 
 This repository holds runnable examples, sample invoices you can test with, and the MCP registry manifest. The service itself is not open source.
 
+Nothing you send is stored: the document is parsed in memory and the response is built from it. [Privacy](PRIVACY.md) ([full policy](https://peculiar.systems/privacy)) · [Terms](https://peculiar.systems/terms)
+
+**The bridge in `bridge/` is a transparent proxy**, not a second implementation: it mirrors whatever `tools/list` returns from the hosted server, so the two can never drift. The five tools and their annotations — all read-only, non-destructive, idempotent, closed-world — are in [`bridge/tools.json`](bridge/tools.json), checked by [`tests/`](tests/). A static analyser reading the bridge source alone sees one dispatch callback and no tools; that is the proxy, not the tool surface.
+
 ## 60 seconds
 
 ```bash
