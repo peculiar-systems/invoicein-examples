@@ -1,11 +1,11 @@
 {
   "source": "https://invoicein-api.peculiar.systems/mcp/",
-  "fetched_at": "2026-09-08T09:26:06Z",
+  "fetched_at": "2026-09-25T08:43:02Z",
   "tools": [
     {
       "name": "read_invoice",
       "title": "Read invoice",
-      "description": "Parse one European e-invoice into canonical EN 16931 JSON and validate it against the official rule sets in the same call. Use it when you need the invoice content (seller, buyer, lines, totals, payment) together with the verdict; use validate_invoice for a verdict-only answer, invoice_to_html / invoice_to_csv / invoice_to_datev for renderings. Input: XML (UBL, CII, XRechnung, Peppol BIS 3, FatturaPA, KSeF FA(2)/FA(3)) or a ZUGFeRD/Factur-X hybrid PDF up to 25 MB; plain or scanned PDFs without embedded XML are rejected (no OCR). Returns the parsed invoice, the validation report with fix hints in `lang`, and timings; an unreadable file returns ok=false with error.code/message/hint instead of raising. A FatturaPA lot returns only its first invoice, with a note. Costs one invoice credit per call; without an API key the anonymous quota is 20 invoices per day per IP. Nothing is stored.",
+      "description": "Parse one European or UAE (PINT AE) e-invoice into canonical EN 16931 JSON and validate it against the official rule sets in the same call. Use it when you need the invoice content (seller, buyer, lines, totals, payment) together with the verdict; use validate_invoice for a verdict-only answer, invoice_to_html / invoice_to_csv / invoice_to_datev for renderings. Input: XML (UBL, CII, XRechnung, Peppol BIS 3, UAE PINT AE, FatturaPA, KSeF FA(2)/FA(3)) or a ZUGFeRD/Factur-X hybrid PDF up to 25 MB; plain or scanned PDFs without embedded XML are rejected (no OCR). Returns the parsed invoice, the validation report with fix hints in `lang`, and timings; an unreadable file returns ok=false with error.code/message/hint instead of raising. A FatturaPA lot returns only its first invoice, with a note. For a Polish KSeF invoice, pass the KSeF number in `ksef`: it is checked against the invoice and returned on payment.ksef_number. Costs one invoice credit per call; without an API key the anonymous quota is 20 invoices per day per IP. Nothing is stored.",
       "inputSchema": {
         "properties": {
           "file_base64": {
@@ -32,10 +32,16 @@
             ],
             "title": "Lang",
             "type": "string"
+          },
+          "ksef": {
+            "default": "",
+            "description": "Poland only: the KSeF number the National e-Invoice System gave this invoice — 35 characters, NNNNNNNNNN-RRRRMMDD-FFFFFFFFFFFF-FF — or the collective identifier covering it (NNNNNNNNNN-IZRRRRMM-FFFFFFFFFFFF-FF). KSeF assigns it on acceptance, so it is never inside the FA(2)/FA(3) XML: it arrives beside the invoice in the KSeF API response, the UPO or the QR code on a visualisation. Pass it and it is checked against the invoice and returned on payment.ksef_number, the reference a Polish buyer must quote in the bank transfer title from 2027-01-01. Leave empty for invoices from any other country.",
+            "title": "Ksef",
+            "type": "string"
           }
         },
-        "type": "object",
-        "title": "read_invoiceArguments"
+        "title": "read_invoiceArguments",
+        "type": "object"
       },
       "outputSchema": {
         "properties": {
@@ -304,7 +310,7 @@
     {
       "name": "validate_invoice",
       "title": "Validate invoice",
-      "description": "Validate one European e-invoice against the official rule sets (XSD, EN 16931, XRechnung, Peppol BIS, FatturaPA, KSeF, arithmetic) and return the verdict without the invoice body. Use it for pass/fail and the list of errors and warnings; use read_invoice when you also need lines, totals and payment data. Input: XML (UBL, CII, XRechnung, Peppol BIS 3, FatturaPA, KSeF FA(2)/FA(3)) or a ZUGFeRD/Factur-X hybrid PDF up to 25 MB; plain or scanned PDFs without embedded XML are rejected (no OCR). Returns the validation report (valid flag, counts, rule sets with versions, failed rules with rule id, severity, fix hint in `lang`, affected field and who must act), the detected source and the document header; an unreadable file returns ok=false with error.code/message/hint instead of raising. Costs one invoice credit per call; without an API key the anonymous quota is 20 invoices per day per IP. Nothing is stored.",
+      "description": "Validate one European or UAE (PINT AE) e-invoice against the official rule sets (XSD, EN 16931, XRechnung, Peppol BIS, PINT AE, FatturaPA, KSeF, arithmetic) and return the verdict without the invoice body. Use it for pass/fail and the list of errors and warnings; use read_invoice when you also need lines, totals and payment data. Input: XML (UBL, CII, XRechnung, Peppol BIS 3, UAE PINT AE, FatturaPA, KSeF FA(2)/FA(3)) or a ZUGFeRD/Factur-X hybrid PDF up to 25 MB; plain or scanned PDFs without embedded XML are rejected (no OCR). Returns the validation report (valid flag, counts, rule sets with versions, failed rules with rule id, severity, fix hint in `lang`, affected field and who must act), the detected source and the document header; an unreadable file returns ok=false with error.code/message/hint instead of raising. For a Polish KSeF invoice, a KSeF number passed in `ksef` is checked too: shape, NIP check digit, and agreement with the invoice it came with. Costs one invoice credit per call; without an API key the anonymous quota is 20 invoices per day per IP. Nothing is stored.",
       "inputSchema": {
         "properties": {
           "file_base64": {
@@ -331,10 +337,16 @@
             ],
             "title": "Lang",
             "type": "string"
+          },
+          "ksef": {
+            "default": "",
+            "description": "Poland only: the KSeF number the National e-Invoice System gave this invoice — 35 characters, NNNNNNNNNN-RRRRMMDD-FFFFFFFFFFFF-FF — or the collective identifier covering it (NNNNNNNNNN-IZRRRRMM-FFFFFFFFFFFF-FF). KSeF assigns it on acceptance, so it is never inside the FA(2)/FA(3) XML: it arrives beside the invoice in the KSeF API response, the UPO or the QR code on a visualisation. Pass it and it is checked against the invoice and returned on payment.ksef_number, the reference a Polish buyer must quote in the bank transfer title from 2027-01-01. Leave empty for invoices from any other country.",
+            "title": "Ksef",
+            "type": "string"
           }
         },
-        "type": "object",
-        "title": "validate_invoiceArguments"
+        "title": "validate_invoiceArguments",
+        "type": "object"
       },
       "outputSchema": {
         "properties": {
@@ -574,7 +586,7 @@
     {
       "name": "invoice_to_html",
       "title": "Render invoice as HTML",
-      "description": "Render one European e-invoice as a self-contained, printable HTML page: header, seller and buyer, line items, VAT breakdown, totals and payment details in one layout regardless of the source syntax, labels in `lang`. Use it to show an invoice to a person or to print it to PDF from a browser; it does not validate (use validate_invoice) and is not an accounting export (use invoice_to_csv or invoice_to_datev). Input: XML (UBL, CII, XRechnung, Peppol BIS 3, FatturaPA, KSeF FA(2)/FA(3)) or a ZUGFeRD/Factur-X hybrid PDF up to 25 MB; plain or scanned PDFs without embedded XML are rejected (no OCR). Returns the HTML document as one text string with inline CSS and no external assets; an unreadable file returns a tool error with the reason. Costs one invoice credit per call; without an API key the anonymous quota is 20 invoices per day per IP. Nothing is stored.",
+      "description": "Render one European e-invoice as a self-contained, printable HTML page: header, seller and buyer, line items, VAT breakdown, totals and payment details in one layout regardless of the source syntax, labels in `lang`. Use it to show an invoice to a person or to print it to PDF from a browser; it does not validate (use validate_invoice) and is not an accounting export (use invoice_to_csv or invoice_to_datev). Input: XML (UBL, CII, XRechnung, Peppol BIS 3, UAE PINT AE, FatturaPA, KSeF FA(2)/FA(3)) or a ZUGFeRD/Factur-X hybrid PDF up to 25 MB; plain or scanned PDFs without embedded XML are rejected (no OCR). Returns the HTML document as one text string with inline CSS and no external assets; an unreadable file returns a tool error with the reason. Costs one invoice credit per call; without an API key the anonymous quota is 20 invoices per day per IP. Nothing is stored.",
       "inputSchema": {
         "properties": {
           "file_base64": {
@@ -601,10 +613,16 @@
             ],
             "title": "Lang",
             "type": "string"
+          },
+          "ksef": {
+            "default": "",
+            "description": "Poland only: the KSeF number the National e-Invoice System gave this invoice — 35 characters, NNNNNNNNNN-RRRRMMDD-FFFFFFFFFFFF-FF — or the collective identifier covering it (NNNNNNNNNN-IZRRRRMM-FFFFFFFFFFFF-FF). KSeF assigns it on acceptance, so it is never inside the FA(2)/FA(3) XML: it arrives beside the invoice in the KSeF API response, the UPO or the QR code on a visualisation. Pass it and it is checked against the invoice and returned on payment.ksef_number, the reference a Polish buyer must quote in the bank transfer title from 2027-01-01. Leave empty for invoices from any other country.",
+            "title": "Ksef",
+            "type": "string"
           }
         },
-        "type": "object",
-        "title": "invoice_to_htmlArguments"
+        "title": "invoice_to_htmlArguments",
+        "type": "object"
       },
       "outputSchema": {
         "properties": {
@@ -629,7 +647,7 @@
     {
       "name": "invoice_to_csv",
       "title": "Export invoice as CSV",
-      "description": "Export one European e-invoice as a flat CSV table for a spreadsheet or a database import. Document columns: invoice id, type, issue and due date, currency, seller and buyer name / VAT id / country, buyer and order reference, net / tax / gross / due totals, IBAN, BIC, remittance info, detected format and profile; with level=lines each row adds line id, item name, seller item id, quantity, unit, unit price, net amount, VAT category and rate, note. Use invoice_to_datev for DATEV bookkeeping and read_invoice for the full JSON. Input: XML (UBL, CII, XRechnung, Peppol BIS 3, FatturaPA, KSeF FA(2)/FA(3)) or a ZUGFeRD/Factur-X hybrid PDF up to 25 MB; plain or scanned PDFs without embedded XML are rejected (no OCR). A FatturaPA lot yields rows for every invoice in it. Returns the CSV as one text string: comma-separated, header row first, LF line endings, decimal point; an unreadable file returns a tool error with the reason. Costs one invoice credit per call; without an API key the anonymous quota is 20 invoices per day per IP. Nothing is stored.",
+      "description": "Export one European e-invoice as a flat CSV table for a spreadsheet or a database import. Document columns: invoice id, type, issue and due date, currency, seller and buyer name / VAT id / country, buyer and order reference, net / tax / gross / due totals, IBAN, BIC, remittance info, KSeF number, detected format and profile; with level=lines each row adds line id, item name, seller item id, quantity, unit, unit price, net amount, VAT category and rate, note. Use invoice_to_datev for DATEV bookkeeping and read_invoice for the full JSON. Input: XML (UBL, CII, XRechnung, Peppol BIS 3, UAE PINT AE, FatturaPA, KSeF FA(2)/FA(3)) or a ZUGFeRD/Factur-X hybrid PDF up to 25 MB; plain or scanned PDFs without embedded XML are rejected (no OCR). A FatturaPA lot yields rows for every invoice in it. Returns the CSV as one text string: comma-separated, header row first, LF line endings, decimal point; an unreadable file returns a tool error with the reason. Costs one invoice credit per call; without an API key the anonymous quota is 20 invoices per day per IP. Nothing is stored.",
       "inputSchema": {
         "properties": {
           "file_base64": {
@@ -653,10 +671,16 @@
             ],
             "title": "Level",
             "type": "string"
+          },
+          "ksef": {
+            "default": "",
+            "description": "Poland only: the KSeF number the National e-Invoice System gave this invoice — 35 characters, NNNNNNNNNN-RRRRMMDD-FFFFFFFFFFFF-FF — or the collective identifier covering it (NNNNNNNNNN-IZRRRRMM-FFFFFFFFFFFF-FF). KSeF assigns it on acceptance, so it is never inside the FA(2)/FA(3) XML: it arrives beside the invoice in the KSeF API response, the UPO or the QR code on a visualisation. Pass it and it is checked against the invoice and returned on payment.ksef_number, the reference a Polish buyer must quote in the bank transfer title from 2027-01-01. Leave empty for invoices from any other country.",
+            "title": "Ksef",
+            "type": "string"
           }
         },
-        "type": "object",
-        "title": "invoice_to_csvArguments"
+        "title": "invoice_to_csvArguments",
+        "type": "object"
       },
       "outputSchema": {
         "properties": {
@@ -681,7 +705,7 @@
     {
       "name": "invoice_to_datev",
       "title": "Export invoice as DATEV Buchungsstapel",
-      "description": "Convert one received (purchase) e-invoice into a DATEV Buchungsstapel import file (EXTF format 700) for German bookkeeping in DATEV Kanzlei-Rechnungswesen or Unternehmen online. Use it only for incoming invoices booked on the German side; use invoice_to_csv for a generic table, read_invoice for the raw data, validate_invoice for rule checks (this tool does not validate). Input: XML (UBL, CII, XRechnung, Peppol BIS 3, FatturaPA, KSeF FA(2)/FA(3)) or a ZUGFeRD/Factur-X hybrid PDF up to 25 MB; plain or scanned PDFs without embedded XML are rejected (no OCR). Returns the file content as one text string, decoded from cp1252: the EXTF header line, the DATEV column header, then one booking row per VAT-rate group with the gross amount and S/H flag (H for credit notes), the expense account chosen by rate under the selected SKR (e.g. SKR03 3400 for 19 %, 3300 for 7 %, 3200 for 0 %, 3120 intra-EU, 3425 reverse charge), the creditor account as Gegenkonto, document and due date, invoice number in Belegfeld 1, seller name as Buchungstext and the seller VAT id on intra-EU / reverse-charge rows. Save it as cp1252 with CRLF before importing; the account mapping is a default to confirm with the tax advisor. An unreadable file returns a tool error with the reason. Costs one invoice credit per call; without an API key the anonymous quota is 20 invoices per day per IP. Nothing is stored.",
+      "description": "Convert one received (purchase) e-invoice into a DATEV Buchungsstapel import file (EXTF format 700) for German bookkeeping in DATEV Kanzlei-Rechnungswesen or Unternehmen online. Use it only for incoming invoices booked on the German side; use invoice_to_csv for a generic table, read_invoice for the raw data, validate_invoice for rule checks (this tool does not validate). Input: XML (UBL, CII, XRechnung, Peppol BIS 3, UAE PINT AE, FatturaPA, KSeF FA(2)/FA(3)) or a ZUGFeRD/Factur-X hybrid PDF up to 25 MB; plain or scanned PDFs without embedded XML are rejected (no OCR). Returns the file content as one text string, decoded in UTF-8: the EXTF header line, the DATEV column header, then one booking row per VAT-rate group with the gross amount and S/H flag (H for credit notes), the expense account chosen by rate under the selected SKR (e.g. SKR03 3400 for 19 %, 3300 for 7 %, 3200 for 0 %, 3120 intra-EU, 3425 reverse charge), the creditor account as Gegenkonto, document and due date, invoice number in Belegfeld 1, seller name as Buchungstext and the seller VAT id on intra-EU / reverse-charge rows. Save it as UTF-8 with CRLF before importing; the account mapping is a default to confirm with the tax advisor. An unreadable file returns a tool error with the reason. Costs one invoice credit per call; without an API key the anonymous quota is 20 invoices per day per IP. Nothing is stored.",
       "inputSchema": {
         "properties": {
           "file_base64": {
@@ -714,8 +738,8 @@
             "type": "string"
           }
         },
-        "type": "object",
-        "title": "invoice_to_datevArguments"
+        "title": "invoice_to_datevArguments",
+        "type": "object"
       },
       "outputSchema": {
         "properties": {

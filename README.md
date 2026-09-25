@@ -3,11 +3,11 @@
 [![MCP server rated A on Glama](https://glama.ai/mcp/servers/peculiar-systems/invoicein-examples/badges/score.svg)](https://glama.ai/mcp/servers/peculiar-systems/invoicein-examples)
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://www.postman.com/peculiar-systems-3265262/peculiar-systems/collection/4xkrtoq/invoicein-inbound-e-invoice-api)
 
-**Any European e-invoice a business *receives* → one canonical EN 16931 JSON, a validation report with plain-language fix hints, a PDF, CSV or DATEV export.** One stateless endpoint, nothing stored.
+**Any European or UAE (PINT AE) e-invoice a business *receives* → one canonical EN 16931 JSON, a validation report with plain-language fix hints, a PDF, CSV or DATEV export.** One stateless endpoint, nothing stored.
 
-Accepts: XRechnung (UBL and CII), EN 16931 UBL 2.1 Invoice/CreditNote, Peppol BIS Billing 3, CII D16B, ZUGFeRD 1.0 / 2.x and Factur-X hybrid PDFs, Italy's FatturaPA 1.2, Poland's KSeF FA(2)/FA(3), Romania's RO e-Factura (CIUS-RO).
+Accepts: XRechnung (UBL and CII), EN 16931 UBL 2.1 Invoice/CreditNote, Peppol BIS Billing 3, CII D16B, ZUGFeRD 1.0 / 2.x and Factur-X hybrid PDFs, Italy's FatturaPA 1.2, Poland's KSeF FA(2)/FA(3), Romania's RO e-Factura (CIUS-RO), the UAE's PINT AE (Billing and Self-Billing).
 
-Validated against: EN 16931 validation artefacts 1.3.16, XRechnung 3.0.2 (KoSIT Schematron 2.6.0), Peppol BIS Billing 3, FNFE CTC-FR 1.4.0.04 (the BR-FR rules; runs when seller and buyer are both established in France), CIUS-RO 1.0.1, the UBL, CII, FatturaPA and KSeF schemas — plus arithmetic cross-checks on every format and market conventions no Schematron reads (German Skonto terms in free text, the Polish KSeF number). The live list with versions is at `GET /v1/formats`.
+Validated against: EN 16931 validation artefacts 1.3.16, XRechnung 3.0.2 (KoSIT Schematron 2.6.0), Peppol BIS Billing 3, FNFE CTC-FR 1.4.0.04 (the BR-FR rules; runs when seller and buyer are both established in France), CIUS-RO 1.0.1, OpenPeppol's PINT AE 1.0.4 for the UAE (free check page: https://invoicein.peculiar.systems/uae), the UBL, CII, FatturaPA and KSeF schemas — plus arithmetic cross-checks on every format and market conventions no Schematron reads (German Skonto terms in free text, the Polish KSeF number). The live list with versions is at `GET /v1/formats`.
 
 - Product page: https://invoicein.peculiar.systems (EN · [DE](https://invoicein.peculiar.systems/de) · [PL](https://invoicein.peculiar.systems/pl) · [IT](https://invoicein.peculiar.systems/it) · [FR](https://invoicein.peculiar.systems/fr))
 - API reference (interactive): https://invoicein-api.peculiar.systems/docs
@@ -103,7 +103,7 @@ Both XRechnung files produce the same canonical JSON (only the syntax-specific `
 
 ## What it does not do
 
-No OCR (a PDF without embedded XML is rejected with `pdf-no-xml`). Not a Peppol access point, not a French PDP, not a KSeF or SdI client: it reads what you already received and never transmits an invoice anywhere. Factur-X/ZUGFeRD profiles below EN 16931 (MINIMUM, BASIC WL, BASIC) get schema and arithmetic checks only, because the EN 16931 rules would only produce noise there. Validation results are informational, not legal advice.
+No OCR (a PDF without embedded XML is rejected with `pdf-no-xml`). Not a Peppol access point, not a French PDP, not a UAE Accredited Service Provider, not a KSeF or SdI client: it reads what you already received and never transmits an invoice anywhere. Factur-X/ZUGFeRD profiles below EN 16931 (MINIMUM, BASIC WL, BASIC) get schema and arithmetic checks only, because the EN 16931 rules would only produce noise there. Validation results are informational, not legal advice.
 
 ## Licence
 
