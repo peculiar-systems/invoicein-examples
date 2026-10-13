@@ -7,7 +7,7 @@
 
 Accepts: XRechnung (UBL and CII), EN 16931 UBL 2.1 Invoice/CreditNote, Peppol BIS Billing 3, CII D16B, ZUGFeRD 1.0 / 2.x and Factur-X hybrid PDFs, Italy's FatturaPA 1.2, Poland's KSeF FA(2)/FA(3), Romania's RO e-Factura (CIUS-RO), the UAE's PINT AE (Billing and Self-Billing).
 
-Validated against: EN 16931 validation artefacts 1.3.16, XRechnung 3.0.2 (KoSIT Schematron 2.6.0), Peppol BIS Billing 3, FNFE CTC-FR 1.4.0.04 (the BR-FR rules; runs when seller and buyer are both established in France), CIUS-RO 1.0.1, OpenPeppol's PINT AE 1.0.4 for the UAE (free check page: https://invoicein.peculiar.systems/uae), the UBL, CII, FatturaPA and KSeF schemas — plus arithmetic cross-checks on every format and market conventions no Schematron reads (German Skonto terms in free text, the Polish KSeF number). The live list with versions is at `GET /v1/formats`.
+Validated against: EN 16931 validation artefacts 1.3.17, XRechnung 3.0.2 (KoSIT Schematron 2.6.0), Peppol BIS Billing 3, FNFE CTC-FR 1.4.0.04 (the BR-FR rules; runs when seller and buyer are both established in France), CIUS-RO 1.0.1, OpenPeppol's PINT AE 1.0.4 for the UAE (free check page: https://invoicein.peculiar.systems/uae), the UBL, CII, FatturaPA and KSeF schemas — plus arithmetic cross-checks on every format and market conventions no Schematron reads (German Skonto terms in free text, the Polish KSeF number). The live list with versions is at `GET /v1/formats`.
 
 - Product page: https://invoicein.peculiar.systems (EN · [DE](https://invoicein.peculiar.systems/de) · [PL](https://invoicein.peculiar.systems/pl) · [IT](https://invoicein.peculiar.systems/it) · [FR](https://invoicein.peculiar.systems/fr))
 - API reference (interactive): https://invoicein-api.peculiar.systems/docs
@@ -47,7 +47,7 @@ The response ([full example](examples/response-peppol.json)):
     "payment":  { "means_code": "30", "remittance_info": "Snippet1", "credit_transfers": [ { "iban": "IBAN32423940", "account_name": "AccountName", "bic": "BIC324098" } ] }
   },
   "validation": { "valid": true, "errors": 0, "warnings": 0,
-                  "rule_sets": [ { "id": "XSD:ubl-invoice" }, { "id": "EN16931-UBL", "version": "EN 16931 validation artefacts 1.3.16" }, { "id": "Peppol-UBL" } ],
+                  "rule_sets": [ { "id": "XSD:ubl-invoice" }, { "id": "EN16931-UBL", "version": "EN 16931 validation artefacts 1.3.17" }, { "id": "Peppol-UBL" } ],
                   "issues": [] },
   "timings_ms": { "detect": 0.5, "map": 14.4, "validate": 86.0, "total": 100.8 },
   "credits": { "mode": "key", "remaining": 99 }
