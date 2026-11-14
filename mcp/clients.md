@@ -2,7 +2,7 @@
 
 Remote server, streamable HTTP: `https://invoicein-api.peculiar.systems/mcp`
 
-Tools: `read_invoice` (canonical JSON + validation), `validate_invoice` (report only), `invoice_to_html`, `invoice_to_csv`, `invoice_to_datev`. Every tool takes `file_base64` (the invoice file) and, where relevant, `lang` (`en`, `de`, `pl`, `it`, `fr`). One tool call = one credit; without a key the demo quota (20 a day per IP) applies. A file that carries several invoices returns only the first one over MCP — use the REST API for lots.
+Tools: `read_invoice` (canonical JSON + validation), `validate_invoice` (report only), `invoice_to_html`, `invoice_to_csv`, `invoice_to_datev`. Every tool takes `file_base64` (the invoice file) and, where relevant, `lang` (`en`, `de`, `pl`, `it`, `fr`). One tool call = one credit; without a key 5 a day per IP, and each answer says where the free key (100 invoices, issued at once) is. A file that carries several invoices returns only the first one over MCP — use the REST API for lots.
 
 ## Claude Desktop / Claude Code
 

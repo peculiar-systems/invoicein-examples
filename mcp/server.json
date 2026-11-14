@@ -17,7 +17,7 @@
     "url": "https://github.com/peculiar-systems/invoicein-examples",
     "source": "github"
   },
-  "version": "0.1.3",
+  "version": "0.1.4",
   "websiteUrl": "https://invoicein.peculiar.systems",
   "remotes": [
     {
@@ -26,7 +26,7 @@
       "headers": [
         {
           "name": "X-Api-Key",
-          "description": "InvoiceIn API key. Optional: without it the demo quota of 20 invoices a day per IP applies.",
+          "description": "InvoiceIn API key. Optional: without it 5 invoices a day per IP. A free key (100 invoices) is issued at once on invoicein.peculiar.systems.",
           "isRequired": false,
           "isSecret": true
         }

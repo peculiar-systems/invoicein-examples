@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## InvoiceIn\nDrop this in front of any workflow that receives e-invoices (IMAP trigger, webhook, file watcher).\n\nThe HTTP Request node posts the binary attachment to InvoiceIn and returns canonical EN 16931 JSON plus a validation report. Set your API key in the node's header (or remove it to use the 20-a-day demo quota).",
+        "content": "## InvoiceIn\nDrop this in front of any workflow that receives e-invoices (IMAP trigger, webhook, file watcher).\n\nThe HTTP Request node posts the binary attachment to InvoiceIn and returns canonical EN 16931 JSON plus a validation report. Set your API key in the node's header (or remove it to use the no-key quota of 5 invoices a day).",
         "height": 220,
         "width": 420
       },

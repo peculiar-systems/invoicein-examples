@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # InvoiceIn — every endpoint once. Run from the repository root.
 #   INVOICEIN_KEY=ii_... ./examples/curl.sh
-# Without INVOICEIN_KEY the calls use the no-key demo quota (20 invoices a day per IP).
+# Without INVOICEIN_KEY the calls use the no-key quota (5 invoices a day per IP); a free key gives 100:
+#   curl -X POST https://invoicein-api.peculiar.systems/v1/keys -H 'Content-Type: application/json' -d '{"email": "you@company.com"}'
 set -euo pipefail
 API="${INVOICEIN_API:-https://invoicein-api.peculiar.systems}"
 AUTH=(-H "X-Api-Key: ${INVOICEIN_KEY:-}")   # an empty key header is ignored by the API (demo quota applies)

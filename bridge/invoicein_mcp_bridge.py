@@ -7,7 +7,7 @@ output schemas, annotations — and forwards every call. No parsing happens here
 InvoiceIn and the answer comes back.
 
     pip install "mcp>=1.10,<3"
-    INVOICEIN_KEY=ii_...  python invoicein_mcp_bridge.py        # key optional: demo quota without it
+    INVOICEIN_KEY=ii_...  python invoicein_mcp_bridge.py        # key optional: 5 invoices a day without it
     python invoicein_mcp_bridge.py --snapshot                    # refresh tools.json from the hosted server
 
 Tool definitions are fetched from the hosted server when the first client asks for them; if it cannot
@@ -52,7 +52,8 @@ INSTRUCTIONS = (
     "(XML in UBL, CII, XRechnung, Peppol BIS 3, FatturaPA or KSeF syntax, or a ZUGFeRD/Factur-X hybrid PDF) "
     "base64-encoded in `file_base64`, up to 25 MB: read_invoice (data + validation), validate_invoice (verdict only), "
     "invoice_to_html (printable view), invoice_to_csv (flat table), invoice_to_datev (German bookkeeping import). "
-    "Every tool call costs one invoice credit; without an API key the anonymous quota is 20 invoices per day per IP. "
+    "Every tool call costs one invoice credit; without an API key the anonymous quota is 5 invoices per day per IP "
+    "(a free key gives 100: https://invoicein.peculiar.systems/#get). "
     "Calls are forwarded to the hosted InvoiceIn server; files are processed in memory and never stored."
 )
 

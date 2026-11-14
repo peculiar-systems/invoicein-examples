@@ -29,7 +29,12 @@ curl -X POST "https://invoicein-api.peculiar.systems/v1/invoice?include=validati
   -F file=@samples/factur-x-en16931.pdf
 ```
 
-No key yet? Leave the header out: 20 invoices a day per IP, same output. A trial key (100 invoices, 30 days, no card) comes from the product page.
+No key yet? Leave the header out: 5 invoices a day per IP, same output, and every answer says how many are left. A free key — 100 invoices, no card, no expiry — is issued at once, on the [product page](https://invoicein.peculiar.systems/#get) or with one call:
+
+```bash
+curl -X POST "https://invoicein-api.peculiar.systems/v1/keys" \
+  -H "Content-Type: application/json" -d '{"email": "you@company.com"}'
+```
 
 The response ([full example](examples/response-peppol.json)):
 
